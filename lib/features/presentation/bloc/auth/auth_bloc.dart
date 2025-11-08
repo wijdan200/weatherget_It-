@@ -31,7 +31,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       },
       onError: (error) {
         if (!isClosed) {
-          emit(AuthError('Auth state error: ${error.toString()}', isLogin: state.isLogin, obscurePassword: state.obscurePassword));
+          debugPrint("Auth state stream error: ${error.toString()}");
+          // Trigger auth check which will handle the error state
+          add(AuthCheckRequested());
         }
       },
     );
@@ -107,14 +109,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // User canceled the sign-in
         emit(AuthUnauthenticated(isLogin: state.isLogin, obscurePassword: state.obscurePassword));
       }
-      if (credential?.user != null) {
-  emit(AuthAuthenticated(
-    credential!.user!,
-    isLogin: state.isLogin,
-    obscurePassword: state.obscurePassword,
-  ));
-}
-
     } catch (e) {
       debugPrint("Google Sign-In error: $e");
       emit(AuthError(e.toString(), isLogin: state.isLogin, obscurePassword: state.obscurePassword));

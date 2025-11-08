@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutterweather/features/data/datasource/auth_preferences_service.dart';
 
 class AuthService {
@@ -36,7 +37,7 @@ class AuthService {
       
       return credential;
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     } catch (e) {
       throw Exception('An error occurred: ${e.toString()}');
     }
@@ -60,7 +61,7 @@ class AuthService {
       
       return credential;
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     } catch (e) {
       throw Exception('An error occurred: ${e.toString()}');
     }
@@ -105,7 +106,7 @@ class AuthService {
       
       return userCredential;
     } on FirebaseAuthException catch (e) {
-      throw _handleAuthException(e);
+      throw Exception(_handleAuthException(e));
     } catch (e) {
       throw Exception('Google Sign-In error: ${e.toString()}');
     }
@@ -113,11 +114,26 @@ class AuthService {
 
   // Sign out
   Future<void> signOut() async {
-    await Future.wait([
-      _firebaseAuth.signOut(),
-      _googleSignIn.signOut(),
-      _authPreferences.clearAuthState(),
-    ]);
+    try {
+      await Future.wait([
+        _firebaseAuth.signOut(),
+        _googleSignIn.signOut(),
+        _authPreferences.clearAuthState(),
+      ]);
+    } catch (e) {
+      // Try to sign out from each service individually if Future.wait fails
+      try {
+        await _firebaseAuth.signOut();
+      } catch (_) {}
+      try {
+        await _googleSignIn.signOut();
+      } catch (_) {}
+      try {
+        await _authPreferences.clearAuthState();
+      } catch (_) {}
+      // Re-throw the original exception
+      throw Exception('Sign out error: ${e.toString()}');
+    }
   }
 
   // Save auth state to shared preferences
@@ -127,13 +143,18 @@ class AuthService {
     String? name,
     String? photoUrl,
   }) async {
-    await _authPreferences.saveAuthState(
-      userId: user.uid,
-      email: user.email ?? '',
-      name: name ?? user.displayName,
-      photoUrl: photoUrl ?? user.photoURL,
-      authProvider: authProvider ?? user.providerData.firstOrNull?.providerId ?? 'email',
-    );
+    try {
+      await _authPreferences.saveAuthState(
+        userId: user.uid,
+        email: user.email ?? '',
+        name: name ?? user.displayName,
+        photoUrl: photoUrl ?? user.photoURL,
+        authProvider: authProvider ?? user.providerData.firstOrNull?.providerId ?? 'email',
+      );
+    } catch (e) {
+      // Log error but don't throw - saving preferences shouldn't fail the auth flow
+      debugPrint("Error saving auth state to preferences: $e");
+    }
   }
 
   // Get auth state from shared preferences

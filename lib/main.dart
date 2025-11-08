@@ -14,8 +14,19 @@ import 'package:flutterweather/features/data/datasource/firebase_messaging_servi
 // Background message handler (must be top-level function)
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
-  debugPrint("Background message received: ${message.messageId}");
+  try {
+    await Firebase.initializeApp();
+    debugPrint("Background message received: ${message.messageId}");
+    debugPrint("Message data: ${message.data}");
+    debugPrint("Message notification: ${message.notification?.title}");
+    
+    // Show local notification for background messages
+    if (message.notification != null) {
+      await showLocalNotification(message);
+    }
+  } catch (e) {
+    debugPrint("Error in background message handler: $e");
+  }
 }
 
 void main() async {
