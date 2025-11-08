@@ -6,6 +6,9 @@ import 'package:flutterweather/features/presentation/bloc/weatherevent.dart';
 import 'package:flutterweather/features/presentation/bloc/weatherstate.dart';
 import 'package:flutterweather/features/presentation/bloc/auth/auth_bloc.dart';
 import 'package:flutterweather/features/presentation/bloc/auth/auth_event.dart';
+import 'package:flutterweather/injectionDependancy.dart';
+import 'package:flutterweather/features/data/datasource/firebase_messaging_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 
@@ -20,6 +23,84 @@ class WeatherPage extends StatefulWidget {
 class _WeatherPageState extends State<WeatherPage> {
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
+  bool _hasRequestedPermission = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Request notification permission when weather page loads (after login)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _requestNotificationPermission();
+    });
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    if (_hasRequestedPermission) return;
+    _hasRequestedPermission = true;
+
+    try {
+      final messagingService = getIt<FirebaseMessagingService>();
+      
+      // Check current permission status
+      final currentStatus = await messagingService.getPermissionStatus();
+      
+      // Only request if permission is not determined or denied
+      if (currentStatus == AuthorizationStatus.notDetermined || 
+          currentStatus == AuthorizationStatus.denied) {
+        
+        // Show a dialog explaining why we need permission
+        final shouldRequest = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Enable Notifications'),
+            content: const Text(
+              'Stay updated with weather alerts and important notifications. Would you like to enable notifications?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Not Now'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Enable'),
+              ),
+            ],
+          ),
+        );
+
+        if (shouldRequest == true && mounted) {
+          // Request permission (shows system dialog)
+          final result = await messagingService.requestPermission();
+          
+          if (mounted) {
+            if (result.isGranted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Notifications enabled successfully!'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              // Get FCM token after permission granted
+              await messagingService.getToken();
+            } else if (result.isDenied) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Notification permission denied. You can enable it later in settings.'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
+          }
+        }
+      } else if (currentStatus == AuthorizationStatus.authorized) {
+        // Permission already granted, get token
+        await messagingService.getToken();
+      }
+    } catch (e) {
+      debugPrint('Error requesting notification permission: $e');
+    }
+  }
 
   @override
   void dispose() {

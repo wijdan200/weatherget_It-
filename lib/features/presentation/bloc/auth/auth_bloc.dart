@@ -107,6 +107,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // User canceled the sign-in
         emit(AuthUnauthenticated(isLogin: state.isLogin, obscurePassword: state.obscurePassword));
       }
+      if (credential?.user != null) {
+  emit(AuthAuthenticated(
+    credential!.user!,
+    isLogin: state.isLogin,
+    obscurePassword: state.obscurePassword,
+  ));
+}
+
     } catch (e) {
       debugPrint("Google Sign-In error: $e");
       emit(AuthError(e.toString(), isLogin: state.isLogin, obscurePassword: state.obscurePassword));

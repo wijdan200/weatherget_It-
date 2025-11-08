@@ -1,5 +1,6 @@
 import 'package:flutterweather/features/data/datasource/auth_service.dart';
 import 'package:flutterweather/features/data/datasource/auth_preferences_service.dart';
+import 'package:flutterweather/features/data/datasource/firebase_messaging_service.dart';
 import 'package:flutterweather/features/data/datasource/weather_remote.dart';
 import 'package:flutterweather/features/data/repository/WeatherRepositoryImpl.dart';
 import 'package:flutterweather/features/domain/repository/repo.dart';
@@ -19,6 +20,11 @@ void setup(){
   // Register AuthService with AuthPreferencesService dependency
   getIt.registerLazySingleton<AuthService>(
     ()=>AuthService(getIt<AuthPreferencesService>()),
+  );
+
+  // Register Firebase Messaging Service
+  getIt.registerLazySingleton<FirebaseMessagingService>(
+    ()=>FirebaseMessagingService(),
   );
  
   getIt.registerFactory<AuthBloc>(
