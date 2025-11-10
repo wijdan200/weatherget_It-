@@ -9,6 +9,8 @@ import 'package:flutterweather/features/presentation/bloc/auth/auth_state.dart';
 import 'package:flutterweather/features/presentation/bloc/weatherbloc.dart';
 import 'package:flutterweather/features/presentation/pages/login_page.dart';
 import 'package:flutterweather/features/presentation/pages/weather_page.dart';
+import 'package:flutterweather/features/presentation/pages/notifypage.dart';
+import 'package:flutterweather/features/presentation/pages/pagetwo.dart';
 import 'package:flutterweather/features/data/datasource/firebase_messaging_service.dart';
 
 // Background message handler (must be top-level function)
@@ -28,6 +30,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     debugPrint("Error in background message handler: $e");
   }
 }
+
+// Global navigator key for navigation from anywhere
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,12 +76,17 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
+        navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Weather App',
         theme: ThemeData(
           primarySwatch: Colors.blue,
           useMaterial3: true,
         ),
+        routes: {
+          '/notify': (context) => const NotifyPage(),
+          '/another': (context) => const PageTwo(),
+        },
         home: BlocBuilder<AuthBloc, AuthState>(
           builder: (context, state) {
             // If authenticated, show weather page directly

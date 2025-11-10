@@ -1,6 +1,8 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutterweather/main.dart' show navigatorKey;
 
 // Note: Background handler is defined in main.dart
 
@@ -18,7 +20,6 @@ class FirebaseMessagingService {
     }
   }
 
-  // Check current notification permission status
   Future<AuthorizationStatus> getPermissionStatus() async {
     try {
       NotificationSettings settings = await _firebaseMessaging.getNotificationSettings();
@@ -62,9 +63,15 @@ class FirebaseMessagingService {
     }
   }
 
-  // Initialize FCM (without requesting permission - call requestPermission separately)
   Future<void> initialize({bool requestPermissionOnInit = false}) async {
     try {
+      // Set notification channel for Android (important for Infinix devices)
+      await _firebaseMessaging.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      
       // Check permission status first
       final currentStatus = await getPermissionStatus();
       debugPrint("Current notification permission: $currentStatus");
@@ -72,10 +79,13 @@ class FirebaseMessagingService {
       // Only request permission if explicitly requested and not already granted
       if (requestPermissionOnInit && currentStatus != AuthorizationStatus.authorized) {
         await requestPermission();
-      }
-
-      // Get token if permission is granted
-      if (currentStatus == AuthorizationStatus.authorized || 
+        // Re-check status after requesting
+        final newStatus = await getPermissionStatus();
+        if (newStatus == AuthorizationStatus.authorized || 
+            newStatus == AuthorizationStatus.provisional) {
+          await getToken();
+        }
+      } else if (currentStatus == AuthorizationStatus.authorized || 
           currentStatus == AuthorizationStatus.provisional) {
         await getToken();
       }
@@ -83,12 +93,20 @@ class FirebaseMessagingService {
       // Setup foreground message handler
       FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
         try {
-          debugPrint("Foreground message received: ${message.messageId}");
-          debugPrint("Message data: ${message.data}");
-          debugPrint("Message notification: ${message.notification?.title}");
+          debugPrint("=== SHOW NOTIFICATION TRIGGERED ===");
+          debugPrint("📨 Foreground message received: ${message.messageId}");
+          debugPrint("📦 Message data: ${message.data}");
+          debugPrint("📋 Message notification title: ${message.notification?.title}");
+          debugPrint("📋 Message notification body: ${message.notification?.body}");
+          debugPrint("🔔 Calling showLocalNotification...");
+          
+          // Show notification immediately
           await showLocalNotification(message);
-        } catch (e) {
-          debugPrint("Error handling foreground message: $e");
+          
+          debugPrint("✅ Foreground notification handling completed");
+        } catch (e, stackTrace) {
+          debugPrint("❌ Error handling foreground message: $e");
+          debugPrint("Stack trace: $stackTrace");
         }
       });
 
@@ -96,12 +114,14 @@ class FirebaseMessagingService {
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
         debugPrint("Message opened app: ${message.messageId}");
         debugPrint("Message data: ${message.data}");
+        _handleNotificationNavigation(message);
       });
 
-      // Check if app was opened from a notification
+      // Check if app was opened from a notification .. بتشتغل لما يكون مسكر 
       RemoteMessage? initialMessage = await _firebaseMessaging.getInitialMessage();
       if (initialMessage != null) {
         debugPrint("App opened from notification: ${initialMessage.messageId}");
+        _handleNotificationNavigation(initialMessage);
       }
 
       // Setup token refresh handler
@@ -110,6 +130,24 @@ class FirebaseMessagingService {
       });
     } catch (e) {
       debugPrint("Error initializing FCM: $e");
+    }
+  }
+
+  // Handle notification navigation based on data field
+  void _handleNotificationNavigation(RemoteMessage message) {
+     try {
+       final route = message.data['route'] ?? message.data['page'] ?? 'notify';
+      
+      if (route == 'another' || route == 'another_page' || route == 'pagetwo') {
+        navigatorKey.currentState?.pushNamed('/pagetwo');
+        debugPrint("✅ Navigation to PageTwo completed");
+      } else {
+        navigatorKey.currentState?.pushNamed('/notify');
+      }
+    } catch (e) {
+      debugPrint("❌ Error navigating: $e");
+      // Fallback to notify page
+      navigatorKey.currentState?.pushNamed('/notify');
     }
   }
 
@@ -158,13 +196,14 @@ Future<void> initializeLocalNotifications() async {
     const AndroidInitializationSettings androidInitSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // Create notification channel for Android
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'high_importance_channel', // id
       'High Importance Notifications', // name
       description: 'Channel for important notifications',
-      importance: Importance.high,
+      importance: Importance.max, // Changed from high to max for Infinix devices
       playSound: true,
+      enableVibration: true,
+      showBadge: true,
     );
 
     // Initialize the plugin
@@ -175,6 +214,8 @@ Future<void> initializeLocalNotifications() async {
       initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         debugPrint("Notification tapped: ${response.payload}");
+        debugPrint("🔔 Local notification tapped, navigating to NotifyPage...");
+        navigatorKey.currentState?.pushNamed('/notify');
       },
     );
 
@@ -182,10 +223,19 @@ Future<void> initializeLocalNotifications() async {
       debugPrint("Local notifications initialized successfully");
       
       // Create the notification channel (Android 8.0+)
-      await flutterLocalNotificationsPlugin
+      // This is critical for Infinix devices
+      final androidImplementation = flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(channel);
+              AndroidFlutterLocalNotificationsPlugin>();
+      
+      if (androidImplementation != null) {
+        await androidImplementation.createNotificationChannel(channel);
+        debugPrint("Notification channel created: high_importance_channel");
+        
+        // Set as default channel for FCM
+        await androidImplementation.requestNotificationsPermission();
+        debugPrint("Notification permissions requested");
+      }
     } else {
       debugPrint("Failed to initialize local notifications");
     }
@@ -198,26 +248,115 @@ Future<void> initializeLocalNotifications() async {
 Future<void> showLocalNotification(RemoteMessage message) async {
   try {
     final notification = message.notification;
-    if (notification == null) return;
+   
+    if (notification == null) {
+      debugPrint("⚠️ Notification is null, data-only message received");
+      return;
+    }
 
-    const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+    debugPrint("📱 Attempting to show notification: ${notification.title} - ${notification.body}");
+
+    // Ensure notification channel exists before showing notification
+    final androidImplementation = flutterLocalNotificationsPlugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    
+    if (androidImplementation != null) {
+      // Check notification permissions first (Android 13+)
+      final bool? granted = await androidImplementation.requestNotificationsPermission();
+      debugPrint("📋 Notification permission granted: $granted");
+      
+      // Recreate channel to ensure it exists (important for Infinix devices)
+      // Use MAX importance to ensure notifications are always shown
+      const AndroidNotificationChannel channel = AndroidNotificationChannel(
+        'high_importance_channel',
+        'High Importance Notifications',
+        description: 'Channel for important notifications',
+        importance: Importance.max, // Changed from high to max for Infinix devices
+        playSound: true,
+        enableVibration: true,
+        showBadge: true,
+      );
+      
+      await androidImplementation.createNotificationChannel(channel);
+      debugPrint("✅ Notification channel verified/created with MAX importance");
+      debugPrint("📊 Channel ID: ${channel.id}, Importance: ${channel.importance}");
+    } else {
+      debugPrint("⚠️ Android implementation not available");
+    }
+
+    // Use a unique notification ID (use messageId if available, otherwise timestamp)
+    final notificationId = message.messageId?.hashCode ?? 
+                          DateTime.now().millisecondsSinceEpoch.remainder(100000);
+
+    // Use MAX importance and MAX priority for Infinix devices
+    // Try without BigTextStyle first to see if that's the issue
+    final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
       'high_importance_channel',
       'High Importance Notifications',
       channelDescription: 'Channel for important notifications',
-      importance: Importance.high,
-      priority: Priority.high,
+      importance: Importance.max, // MAX importance for Infinix devices
+      priority: Priority.max, // MAX priority for Infinix devices
+      enableVibration: true,
+      playSound: true,
+      showWhen: true,
+      icon: '@mipmap/ic_launcher',
+      channelShowBadge: true,
+      enableLights: true,
+      color: const Color.fromARGB(255, 0, 122, 255),
+      ticker: notification.title ?? 'New notification', // Ticker text for heads-up notification
+      ongoing: false, // Not an ongoing notification
+      autoCancel: true, // Auto cancel when tapped
+      onlyAlertOnce: false, // Alert every time
+      visibility: NotificationVisibility.public, // Make notification visible
+      category: AndroidNotificationCategory.message, // Set category
+      // Remove styleInformation to use default style
     );
 
-    const NotificationDetails notificationDetails =
+    final NotificationDetails notificationDetails =
         NotificationDetails(android: androidDetails);
 
-    await flutterLocalNotificationsPlugin.show(
-      DateTime.now().millisecondsSinceEpoch ~/ 1000,
-      notification.title,
-      notification.body,
-      notificationDetails,
-    );
-  } catch (e) {
-    debugPrint("Error showing local notification: $e");
+    debugPrint("📤 Calling flutterLocalNotificationsPlugin.show()");
+    debugPrint("   - ID: $notificationId");
+    debugPrint("   - Title: ${notification.title ?? 'Notification'}");
+    debugPrint("   - Body: ${notification.body ?? ''}");
+    debugPrint("   - Channel: high_importance_channel");
+    debugPrint("   - Importance: MAX");
+    debugPrint("   - Priority: MAX");
+    
+    try {
+      // Try showing notification with a small delay to ensure channel is ready
+      await Future.delayed(const Duration(milliseconds: 100));
+      
+      await flutterLocalNotificationsPlugin.show(
+        notificationId,
+        notification.title ?? 'Notification',
+        notification.body ?? '',
+        notificationDetails,
+        payload: 'notify_page', // Payload to identify notification for navigation
+      );
+      
+      debugPrint("✅ Notification show() called successfully");
+      debugPrint("✅ Notification shown successfully with ID: $notificationId");
+      
+      // Additional check: Try to get pending notifications
+      final pendingNotifications = await flutterLocalNotificationsPlugin.pendingNotificationRequests();
+      debugPrint("📊 Pending notifications count: ${pendingNotifications.length}");
+      
+      // Verify notification was actually shown by checking after a delay
+      await Future.delayed(const Duration(milliseconds: 500));
+      debugPrint("✅ Notification display verification completed");
+      debugPrint("⚠️ If notification is not visible, check device settings:");
+      debugPrint("   1. Settings → Apps → flutterweather → Notifications");
+      debugPrint("   2. Ensure 'High Importance Notifications' channel is enabled");
+      debugPrint("   3. Settings → Battery → Battery Optimization → Don't optimize");
+      debugPrint("   4. Settings → Do Not Disturb → Check if enabled");
+    } catch (showError, stackTrace) {
+      debugPrint("❌ Error in flutterLocalNotificationsPlugin.show(): $showError");
+      debugPrint("❌ Stack trace: $stackTrace");
+      rethrow;
+    }
+  } catch (e, stackTrace) {
+    debugPrint("❌ Error showing local notification: $e");
+    debugPrint("Stack trace: $stackTrace");
   }
 }

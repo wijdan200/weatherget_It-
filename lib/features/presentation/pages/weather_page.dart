@@ -438,7 +438,9 @@ class _WeatherPageState extends State<WeatherPage> {
                     children: [
                       Icon(Icons.location_on, color: Colors.red, size: 20),
                       SizedBox(width: 5),
-                      Text(
+                        Expanded (
+                          child :
+                             Text(
                         'Loading Location...',
                         style: TextStyle(
                           fontSize: 18,
@@ -447,6 +449,7 @@ class _WeatherPageState extends State<WeatherPage> {
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
+                             ),
                       ),
                     ],
                   ),
