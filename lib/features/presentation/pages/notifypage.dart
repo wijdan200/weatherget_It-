@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutterweather/features/presentation/pages/pagetwo.dart';
+import 'package:go_router/go_router.dart';
 
 class NotifyPage extends StatelessWidget {
   const NotifyPage({super.key});
@@ -24,12 +24,7 @@ class NotifyPage extends StatelessWidget {
             const SizedBox(height: 40),
             ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const PageTwo(),
-                  ),
-                );
+                context.push('/another');
               },
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(

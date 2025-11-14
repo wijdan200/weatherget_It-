@@ -2,7 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutterweather/main.dart' show navigatorKey;
+import 'package:flutterweather/router/app_router.dart';
 
 // Note: Background handler is defined in main.dart
 
@@ -10,6 +10,11 @@ class FirebaseMessagingService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   Future<String?> getToken() async {
+    if (kIsWeb) {
+      debugPrint("FCM Token not available on web");
+      return null;
+    }
+    
     try {
       String? token = await _firebaseMessaging.getToken();
       debugPrint("FCM Token: $token");
@@ -21,6 +26,12 @@ class FirebaseMessagingService {
   }
 
   Future<AuthorizationStatus> getPermissionStatus() async {
+    // Notification permissions not fully supported on web
+    if (kIsWeb) {
+      debugPrint("Notification permissions not available on web");
+      return AuthorizationStatus.notDetermined;
+    }
+    
     try {
       NotificationSettings settings = await _firebaseMessaging.getNotificationSettings();
       return settings.authorizationStatus;
@@ -32,6 +43,17 @@ class FirebaseMessagingService {
 
   // Request notification permissions (shows system dialog)
   Future<NotificationPermissionResult> requestPermission() async {
+    // Notification permissions not fully supported on web
+    if (kIsWeb) {
+      debugPrint("Notification permissions not available on web");
+      return NotificationPermissionResult(
+        isGranted: false,
+        isProvisional: false,
+        isDenied: true,
+        status: AuthorizationStatus.notDetermined,
+      );
+    }
+    
     try {
       NotificationSettings settings = await _firebaseMessaging.requestPermission(
         alert: true,
@@ -64,6 +86,11 @@ class FirebaseMessagingService {
   }
 
   Future<void> initialize({bool requestPermissionOnInit = false}) async {
+    if (kIsWeb) {
+      debugPrint("Firebase Messaging not fully supported on web, skipping initialization");
+      return;
+    }
+    
     try {
       // Set notification channel for Android (important for Infinix devices)
       await _firebaseMessaging.setForegroundNotificationPresentationOptions(
@@ -90,18 +117,19 @@ class FirebaseMessagingService {
         await getToken();
       }
 
-      // Setup foreground message handler
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-        try {
-          debugPrint("=== SHOW NOTIFICATION TRIGGERED ===");
-          debugPrint("📨 Foreground message received: ${message.messageId}");
-          debugPrint("📦 Message data: ${message.data}");
-          debugPrint("📋 Message notification title: ${message.notification?.title}");
-          debugPrint("📋 Message notification body: ${message.notification?.body}");
-          debugPrint("🔔 Calling showLocalNotification...");
-          
-          // Show notification immediately
-          await showLocalNotification(message);
+      // Setup foreground message handler (skip on web)
+      if (!kIsWeb) {
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+          try {
+            debugPrint("=== SHOW NOTIFICATION TRIGGERED ===");
+            debugPrint("📨 Foreground message received: ${message.messageId}");
+            debugPrint("📦 Message data: ${message.data}");
+            debugPrint("📋 Message notification title: ${message.notification?.title}");
+            debugPrint("📋 Message notification body: ${message.notification?.body}");
+            debugPrint("🔔 Calling showLocalNotification...");
+            
+            // Show notification immediately
+            await showLocalNotification(message);
           
           debugPrint("✅ Foreground notification handling completed");
         } catch (e, stackTrace) {
@@ -109,6 +137,7 @@ class FirebaseMessagingService {
           debugPrint("Stack trace: $stackTrace");
         }
       });
+      }
 
       // Setup message opened handler (when user taps notification)
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
@@ -133,21 +162,109 @@ class FirebaseMessagingService {
     }
   }
 
-  // Handle notification navigation based on data field
+  // Handle notification navigation based on data field (for FCM messages)
   void _handleNotificationNavigation(RemoteMessage message) {
      try {
-       final route = message.data['route'] ?? message.data['page'] ?? 'notify';
-      
-      if (route == 'another' || route == 'another_page' || route == 'pagetwo') {
-        navigatorKey.currentState?.pushNamed('/pagetwo');
-        debugPrint("✅ Navigation to PageTwo completed");
-      } else {
-        navigatorKey.currentState?.pushNamed('/notify');
-      }
+       // Default to 'another' (PageTwo) if route not specified
+       final route = message.data['route'] ?? message.data['page'] ?? 'another';
+       debugPrint("🔔 FCM notification tapped, route: $route");
+       navigateToRoute(route);
     } catch (e) {
-      debugPrint("❌ Error navigating: $e");
-      // Fallback to notify page
-      navigatorKey.currentState?.pushNamed('/notify');
+      debugPrint("❌ Error navigating from FCM notification: $e");
+      navigateToRoute('another'); // Fallback to PageTwo
+    }
+  }
+
+  // Handle local notification tap (when user taps notification in notification tray)
+  static void handleLocalNotificationTap(String? payload) {
+    try {
+      debugPrint("🔔 Processing local notification tap...");
+      
+     
+      String route = 'another'; // Default route (PageTwo)
+      
+      if (payload != null && payload.isNotEmpty) {
+        // Remove leading slash if present
+        route = payload.startsWith('/') ? payload.substring(1) : payload;
+        
+        // Handle common route names
+        if (route == 'notify_page' || route == 'notify') {
+          route = 'notify';
+        } else if (route == 'another_page' || route == 'pagetwo' || route == 'another') {
+          route = 'another';
+        } else if (route == 'weather' || route == 'weather_page') {
+          route = 'weather';
+        } else if (route == 'login' || route == 'login_page') {
+          route = 'login';
+        }
+      }
+      
+      debugPrint("   - Extracted route: $route");
+      navigateToRoute(route);
+    } catch (e) {
+      debugPrint("❌ Error handling local notification tap: $e");
+      navigateToRoute('another'); // Fallback to PageTwo
+    }
+  }
+
+  // Navigate to route using GoRouter
+  static void navigateToRoute(String route) {
+    try {
+      final router = AppRouter.router;
+      
+      if (router == null) {
+        debugPrint("⚠️ Router not initialized yet, will retry...");
+        // Retry after a short delay to allow router initialization
+        Future.delayed(const Duration(milliseconds: 500), () {
+          final retryRouter = AppRouter.router;
+          if (retryRouter != null) {
+            performNavigation(retryRouter, route);
+          } else {
+            debugPrint("❌ Router still not available after retry");
+          }
+        });
+        return;
+      }
+      
+      performNavigation(router, route);
+    } catch (e) {
+      debugPrint("❌ Error in navigateToRoute: $e");
+    }
+  }
+
+  // Perform the actual navigation
+  static void performNavigation(dynamic router, String route) {
+    try {
+      // Map route names to paths
+      String path = '/another'; // Default path (PageTwo)
+      
+      switch (route.toLowerCase()) {
+        case 'notify':
+        case 'notify_page':
+          path = '/notify';
+          break;
+        case 'another':
+        case 'another_page':
+        case 'pagetwo':
+          path = '/another';
+          break;
+        case 'weather':
+        case 'weather_page':
+          path = '/weather';
+          break;
+        case 'login':
+        case 'login_page':
+          path = '/login';
+          break;
+        default:
+          path = '/another'; // Default to PageTwo
+      }
+      
+      debugPrint("✅ Navigating to: $path");
+      router.go(path);
+      debugPrint("✅ Navigation completed successfully");
+    } catch (e) {
+      debugPrint("❌ Error performing navigation: $e");
     }
   }
 
@@ -191,6 +308,12 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
 
 Future<void> initializeLocalNotifications() async {
+  // Skip on web - local notifications not supported
+  if (kIsWeb) {
+    debugPrint("Local notifications not supported on web, skipping initialization");
+    return;
+  }
+  
   try {
     // Request permissions for Android 13+
     const AndroidInitializationSettings androidInitSettings =
@@ -213,9 +336,13 @@ Future<void> initializeLocalNotifications() async {
     final bool? initialized = await flutterLocalNotificationsPlugin.initialize(
       initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        debugPrint("Notification tapped: ${response.payload}");
-        debugPrint("🔔 Local notification tapped, navigating to NotifyPage...");
-        navigatorKey.currentState?.pushNamed('/notify');
+        debugPrint("🔔 Local notification tapped!");
+        debugPrint("   - Payload: ${response.payload}");
+        debugPrint("   - ID: ${response.id}");
+        debugPrint("   - Action: ${response.actionId}");
+        
+        // Handle navigation based on payload
+        FirebaseMessagingService.handleLocalNotificationTap(response.payload);
       },
     );
 
@@ -246,6 +373,12 @@ Future<void> initializeLocalNotifications() async {
 
 
 Future<void> showLocalNotification(RemoteMessage message) async {
+  // Skip on web - local notifications not supported
+  if (kIsWeb) {
+    debugPrint("Local notifications not supported on web, skipping");
+    return;
+  }
+  
   try {
     final notification = message.notification;
    
@@ -327,12 +460,17 @@ Future<void> showLocalNotification(RemoteMessage message) async {
       // Try showing notification with a small delay to ensure channel is ready
       await Future.delayed(const Duration(milliseconds: 100));
       
+      // Extract route from message data for navigation
+      // Default to 'another' (PageTwo) if route not specified
+      final route = message.data['route'] ?? message.data['page'] ?? 'another';
+      final payload = route.startsWith('/') ? route.substring(1) : route;
+      
       await flutterLocalNotificationsPlugin.show(
         notificationId,
         notification.title ?? 'Notification',
         notification.body ?? '',
         notificationDetails,
-        payload: 'notify_page', // Payload to identify notification for navigation
+        payload: payload, // Payload contains route for navigation
       );
       
       debugPrint("✅ Notification show() called successfully");

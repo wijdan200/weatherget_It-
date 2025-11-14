@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class PageTwo extends StatelessWidget {
   const PageTwo({super.key});
@@ -7,6 +8,13 @@ class PageTwo extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+      leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            context.go('/notify'); 
+          },
+          tooltip: 'Back to Notify',
+        ),
         title: const Text('Page Two'),
       ),
       body: const Center(

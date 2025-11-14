@@ -5,9 +5,14 @@ import 'package:flutterweather/features/data/datasource/auth_preferences_service
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  // For web, Google Sign-In works automatically with Firebase configuration
+  // For mobile platforms, use serverClientId (Android client ID)
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
-    serverClientId: '387409165601-opsl9cit93e5b56pulihvks9va12923a.apps.googleusercontent.com',
+    // For web, use clientId (web client ID from Firebase Console)
+    // For mobile, use serverClientId (Android client ID)
+    clientId: kIsWeb ? '387409165601-opsl9cit93e5b56pulihvks9va12923a.apps.googleusercontent.com' : null,
+    serverClientId: kIsWeb ? null : '387409165601-opsl9cit93e5b56pulihvks9va12923a.apps.googleusercontent.com',
   );
   final AuthPreferencesService _authPreferences;
 
@@ -80,11 +85,21 @@ class AuthService {
       // Obtain auth details
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
       
-      if (googleAuth.idToken == null) {
-        throw Exception('ID token is null. Check SHA-1: FB:C6:60:11:C7:81:E0:D1:4D:8E:08:7D:EC:FB:25:C0:6C:DC:F6:5D');
+      debugPrint("Google Auth - ID Token: ${googleAuth.idToken != null ? 'Present' : 'Null'}");
+      debugPrint("Google Auth - Access Token: ${googleAuth.accessToken != null ? 'Present' : 'Null'}");
+      
+      // For mobile, idToken is required
+      if (googleAuth.idToken == null && !kIsWeb) {
+        throw Exception('ID token is null. For Android, check SHA-1 certificate: FB:C6:60:11:C7:81:E0:D1:4D:8E:08:7D:EC:FB:25:C0:6C:DC:F6:5D. Make sure Google Sign-In is enabled in Firebase Console.');
+      }
+      
+      // For web, we need at least one token
+      if (googleAuth.idToken == null && googleAuth.accessToken == null) {
+        throw Exception('Both ID token and access token are null. Please check your Google Sign-In configuration in Firebase Console. Make sure Google Sign-In is enabled and authorized domains are configured.');
       }
 
-      // Create credential
+      // Create credential - use idToken if available, otherwise accessToken
+      // For web, Firebase Auth can work with just accessToken in some cases
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -106,8 +121,13 @@ class AuthService {
       
       return userCredential;
     } on FirebaseAuthException catch (e) {
+      debugPrint("Firebase Auth Exception: ${e.code} - ${e.message}");
       throw Exception(_handleAuthException(e));
+    } on Exception catch (e) {
+      debugPrint("Google Sign-In Exception: $e");
+      rethrow;
     } catch (e) {
+      debugPrint("Google Sign-In error: $e");
       throw Exception('Google Sign-In error: ${e.toString()}');
     }
   }
