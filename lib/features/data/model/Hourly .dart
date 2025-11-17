@@ -126,13 +126,13 @@ class Hourly {
     if (json['weatherDesc'] != null) {
       weatherDesc = <WeatherDesc>[];
       json['weatherDesc'].forEach((v) {
-        weatherDesc!.add(new WeatherDesc.fromJson(v));
+        weatherDesc!.add(WeatherDesc.fromJson(v));
       });
     }
     if (json['weatherIconUrl'] != null) {
       weatherIconUrl = <WeatherIconUrl>[];
       json['weatherIconUrl'].forEach((v) {
-        weatherIconUrl!.add(new WeatherIconUrl.fromJson(v));
+        weatherIconUrl!.add(WeatherIconUrl.fromJson(v));
       });
     }
     winddir16Point = json['winddir16Point'];
@@ -142,53 +142,53 @@ class Hourly {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['DewPointC'] = this.dewPointC;
-    data['DewPointF'] = this.dewPointF;
-    data['FeelsLikeC'] = this.feelsLikeC;
-    data['FeelsLikeF'] = this.feelsLikeF;
-    data['HeatIndexC'] = this.heatIndexC;
-    data['HeatIndexF'] = this.heatIndexF;
-    data['WindChillC'] = this.windChillC;
-    data['WindChillF'] = this.windChillF;
-    data['WindGustKmph'] = this.windGustKmph;
-    data['WindGustMiles'] = this.windGustMiles;
-    data['chanceoffog'] = this.chanceoffog;
-    data['chanceoffrost'] = this.chanceoffrost;
-    data['chanceofhightemp'] = this.chanceofhightemp;
-    data['chanceofovercast'] = this.chanceofovercast;
-    data['chanceofrain'] = this.chanceofrain;
-    data['chanceofremdry'] = this.chanceofremdry;
-    data['chanceofsnow'] = this.chanceofsnow;
-    data['chanceofsunshine'] = this.chanceofsunshine;
-    data['chanceofthunder'] = this.chanceofthunder;
-    data['chanceofwindy'] = this.chanceofwindy;
-    data['cloudcover'] = this.cloudcover;
-    data['diffRad'] = this.diffRad;
-    data['humidity'] = this.humidity;
-    data['precipInches'] = this.precipInches;
-    data['precipMM'] = this.precipMM;
-    data['pressure'] = this.pressure;
-    data['pressureInches'] = this.pressureInches;
-    data['shortRad'] = this.shortRad;
-    data['tempC'] = this.tempC;
-    data['tempF'] = this.tempF;
-    data['time'] = this.time;
-    data['uvIndex'] = this.uvIndex;
-    data['visibility'] = this.visibility;
-    data['visibilityMiles'] = this.visibilityMiles;
-    data['weatherCode'] = this.weatherCode;
-    if (this.weatherDesc != null) {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['DewPointC'] = dewPointC;
+    data['DewPointF'] = dewPointF;
+    data['FeelsLikeC'] = feelsLikeC;
+    data['FeelsLikeF'] = feelsLikeF;
+    data['HeatIndexC'] = heatIndexC;
+    data['HeatIndexF'] = heatIndexF;
+    data['WindChillC'] = windChillC;
+    data['WindChillF'] = windChillF;
+    data['WindGustKmph'] = windGustKmph;
+    data['WindGustMiles'] = windGustMiles;
+    data['chanceoffog'] = chanceoffog;
+    data['chanceoffrost'] = chanceoffrost;
+    data['chanceofhightemp'] = chanceofhightemp;
+    data['chanceofovercast'] = chanceofovercast;
+    data['chanceofrain'] = chanceofrain;
+    data['chanceofremdry'] = chanceofremdry;
+    data['chanceofsnow'] = chanceofsnow;
+    data['chanceofsunshine'] = chanceofsunshine;
+    data['chanceofthunder'] = chanceofthunder;
+    data['chanceofwindy'] = chanceofwindy;
+    data['cloudcover'] = cloudcover;
+    data['diffRad'] = diffRad;
+    data['humidity'] = humidity;
+    data['precipInches'] = precipInches;
+    data['precipMM'] = precipMM;
+    data['pressure'] = pressure;
+    data['pressureInches'] = pressureInches;
+    data['shortRad'] = shortRad;
+    data['tempC'] = tempC;
+    data['tempF'] = tempF;
+    data['time'] = time;
+    data['uvIndex'] = uvIndex;
+    data['visibility'] = visibility;
+    data['visibilityMiles'] = visibilityMiles;
+    data['weatherCode'] = weatherCode;
+    if (weatherDesc != null) {
       data['weatherDesc'] = weatherDesc!.map((v) => v.toJson()).toList();
     }
-    if (this.weatherIconUrl != null) {
+    if (weatherIconUrl != null) {
       data['weatherIconUrl'] =
-          this.weatherIconUrl!.map((v) => v.toJson()).toList();
+          weatherIconUrl!.map((v) => v.toJson()).toList();
     }
-    data['winddir16Point'] = this.winddir16Point;
-    data['winddirDegree'] = this.winddirDegree;
-    data['windspeedKmph'] = this.windspeedKmph;
-    data['windspeedMiles'] = this.windspeedMiles;
+    data['winddir16Point'] = winddir16Point;
+    data['winddirDegree'] = winddirDegree;
+    data['windspeedKmph'] = windspeedKmph;
+    data['windspeedMiles'] = windspeedMiles;
     return data;
   }
 }

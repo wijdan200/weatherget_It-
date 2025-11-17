@@ -14,7 +14,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 
-
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
 
@@ -597,7 +596,7 @@ class _WeatherPageState extends State<WeatherPage> {
                   const Text(
                     'Weather',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 25,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
@@ -605,6 +604,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 ],
               ),
               Row(
+                
                 children: [
                   IconButton(
                     icon: Icon(Icons.refresh, color: Colors.white),
@@ -633,7 +633,8 @@ class _WeatherPageState extends State<WeatherPage> {
                     tooltip: 'Sign Out',
                   ),
                 ],
-              ),
+             
+),
             ],
           ),
           SizedBox(height: 15),

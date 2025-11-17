@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Link Test - Weather App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .link-container {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        a {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 5px;
+            transition: background-color 0.3s;
+        }
+
+        a:hover {
+            background-color: #1976D2;
+        }
+
+        .link-url {
+            font-family: monospace;
+            background-color: #f0f0f0;
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 12px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>🌤️ Weather App Deep Link Tester</h1>
+    <p><strong>⚠️ Important:</strong> Make sure your app is installed on your Android device!</p>
+    <p><strong>💡 Tip:</strong> Use the "Intent URI" links (first 4 links) - they work best in Chrome on Android!</p>
+    <p>Click any link below to test deep linking.</p>
+
+    <div class="link-container">
+        <h3>Dashboard (Intent URI - Recommended)</h3>
+        <a href="intent://open/dashboard#Intent;scheme=WeatherApp;package=com.example.flutterweather;end">Open Dashboard</a>
+        <div class="link-url">intent://open/dashboard#Intent;scheme=WeatherApp;package=com.example.flutterweather;end</div>
+    </div>
+
+    <div class="link-container">
+        <h3>Weather Page (Intent URI - Recommended)</h3>
+        <a href="intent://open/weather#Intent;scheme=WeatherApp;package=com.example.flutterweather;end">Open Weather</a>
+        <div class="link-url">intent://open/weather#Intent;scheme=WeatherApp;package=com.example.flutterweather;end</div>
+    </div>
+
+    <div class="link-container">
+        <h3>Notify Page (Intent URI)</h3>
+        <a href="intent://open/notify#Intent;scheme=WeatherApp;package=com.example.flutterweather;end">Open Notify</a>
+        <div class="link-url">intent://open/notify#Intent;scheme=WeatherApp;package=com.example.flutterweather;end</div>
+    </div>
+
+    <div class="link-container">
+        <h3>Another Page (Intent URI)</h3>
+        <a href="intent://open/another#Intent;scheme=WeatherApp;package=com.example.flutterweather;end">Open Another</a>
+        <div class="link-url">intent://open/another#Intent;scheme=WeatherApp;package=com.example.flutterweather;end</div>
+    </div>
+
+    <div class="link-container">
+        <h3>Direct Format (Custom Scheme)</h3>
+        <a href="WeatherApp://open/weather">Open Weather (Direct)</a>
+        <div class="link-url">WeatherApp://open/weather</div>
+    </div>
+
+    <div class="link-container">
+        <h3>Alternative Format (without /open/)</h3>
+        <a href="WeatherApp://weather">Open Weather (No Host)</a>
+        <div class="link-url">WeatherApp://weather</div>
+    </div>
+
+    <div class="link-container">
+        <h3>Default (Dashboard)</h3>
+        <a href="WeatherApp://">Open Default</a>
+        <div class="link-url">WeatherApp://</div>
+    </div>
+
+    <script>
+        // Log when links are clicked
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                console.log('Deep link clicked:', this.href);
+            });
+        });
+    </script>
+</body>
+
+</html>

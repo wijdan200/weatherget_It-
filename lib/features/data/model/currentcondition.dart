@@ -70,13 +70,13 @@ class CurrentCondition {
     if (json['weatherDesc'] != null) {
       weatherDesc = <WeatherDesc>[];
       json['weatherDesc'].forEach((v) {
-        weatherDesc!.add(new WeatherDesc.fromJson(v));
+        weatherDesc!.add(WeatherDesc.fromJson(v));
       });
     }
     if (json['weatherIconUrl'] != null) {
       weatherIconUrl = <WeatherIconUrl>[];
       json['weatherIconUrl'].forEach((v) {
-        weatherIconUrl!.add(new WeatherIconUrl.fromJson(v));
+        weatherIconUrl!.add(WeatherIconUrl.fromJson(v));
       });
     }
     winddir16Point = json['winddir16Point'];
@@ -86,34 +86,34 @@ class CurrentCondition {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['FeelsLikeC'] = this.feelsLikeC;
-    data['FeelsLikeF'] = this.feelsLikeF;
-    data['cloudcover'] = this.cloudcover;
-    data['humidity'] = this.humidity;
-    data['localObsDateTime'] = this.localObsDateTime;
-    data['observation_time'] = this.observationTime;
-    data['precipInches'] = this.precipInches;
-    data['precipMM'] = this.precipMM;
-    data['pressure'] = this.pressure;
-    data['pressureInches'] = this.pressureInches;
-    data['temp_C'] = this.tempC;
-    data['temp_F'] = this.tempF;
-    data['uvIndex'] = this.uvIndex;
-    data['visibility'] = this.visibility;
-    data['visibilityMiles'] = this.visibilityMiles;
-    data['weatherCode'] = this.weatherCode;
-    if (this.weatherDesc != null) {
-      data['weatherDesc'] = this.weatherDesc!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['FeelsLikeC'] = feelsLikeC;
+    data['FeelsLikeF'] = feelsLikeF;
+    data['cloudcover'] = cloudcover;
+    data['humidity'] = humidity;
+    data['localObsDateTime'] = localObsDateTime;
+    data['observation_time'] = observationTime;
+    data['precipInches'] = precipInches;
+    data['precipMM'] = precipMM;
+    data['pressure'] = pressure;
+    data['pressureInches'] = pressureInches;
+    data['temp_C'] = tempC;
+    data['temp_F'] = tempF;
+    data['uvIndex'] = uvIndex;
+    data['visibility'] = visibility;
+    data['visibilityMiles'] = visibilityMiles;
+    data['weatherCode'] = weatherCode;
+    if (weatherDesc != null) {
+      data['weatherDesc'] = weatherDesc!.map((v) => v.toJson()).toList();
     }
-    if (this.weatherIconUrl != null) {
+    if (weatherIconUrl != null) {
       data['weatherIconUrl'] =
-          this.weatherIconUrl!.map((v) => v.toJson()).toList();
+          weatherIconUrl!.map((v) => v.toJson()).toList();
     }
-    data['winddir16Point'] = this.winddir16Point;
-    data['winddirDegree'] = this.winddirDegree;
-    data['windspeedKmph'] = this.windspeedKmph;
-    data['windspeedMiles'] = this.windspeedMiles;
+    data['winddir16Point'] = winddir16Point;
+    data['winddirDegree'] = winddirDegree;
+    data['windspeedKmph'] = windspeedKmph;
+    data['windspeedMiles'] = windspeedMiles;
     return data;
   }
 }

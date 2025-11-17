@@ -10,9 +10,9 @@ class Request {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['query'] = this.query;
-    data['type'] = this.type;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['query'] = query;
+    data['type'] = type;
     return data;
   }
 }

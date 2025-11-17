@@ -9,37 +9,37 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-    final _emailController = TextEditingController();
-    final _passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
     
-    void _toggleMode() {
+    void toggleMode() {
       context.read<AuthBloc>().add(LoginModeToggled());
-      _formKey.currentState?.reset();
+      formKey.currentState?.reset();
     }
 
-    void _submit() {
-      if (_formKey.currentState?.validate() ?? false) {
+    void submit() {
+      if (formKey.currentState?.validate() ?? false) {
         final authState = context.read<AuthBloc>().state;
         if (authState.isLogin) {
           context.read<AuthBloc>().add(
                 SignInRequested(
-                  email: _emailController.text.trim(),
-                  password: _passwordController.text,
+                  email: emailController.text.trim(),
+                  password: passwordController.text,
                 ),
               );
         } else {
           context.read<AuthBloc>().add(
                 SignUpRequested(
-                  email: _emailController.text.trim(),
-                  password: _passwordController.text,
+                  email: emailController.text.trim(),
+                  password: passwordController.text,
                 ),
               );
         }
       }
     }
 
-    void _signInWithGoogle() {
+    void signInWithGoogle() {
       context.read<AuthBloc>().add(SignInWithGoogleRequested());
     }
 
@@ -63,7 +63,7 @@ class LoginPage extends StatelessWidget {
             child: SingleChildScrollView(
               padding: EdgeInsets.all(24.0),
               child: Form(
-                key: _formKey,
+                key: formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -94,7 +94,7 @@ class LoginPage extends StatelessWidget {
                     ),
                     SizedBox(height: 40),
                     TextFormField(
-                      controller: _emailController,
+                      controller: emailController,
                       keyboardType: TextInputType.emailAddress,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
@@ -124,7 +124,7 @@ class LoginPage extends StatelessWidget {
                     ),
                     SizedBox(height: 20),
                     TextFormField(
-                      controller: _passwordController,
+                      controller: passwordController,
                       obscureText: authState.obscurePassword,
                       style: TextStyle(color: Colors.white),
                       decoration: InputDecoration(
@@ -178,7 +178,7 @@ class LoginPage extends StatelessWidget {
                       builder: (context, state) {
                         final isLoading = state is AuthLoading;
                         return ElevatedButton(
-                          onPressed: isLoading ? null : _submit,
+                          onPressed: isLoading ? null : submit,
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 16),
                             backgroundColor: Colors.white,
@@ -222,7 +222,7 @@ class LoginPage extends StatelessWidget {
                       builder: (context, state) {
                         final isLoading = state is AuthLoading;
                         return OutlinedButton.icon(
-                          onPressed: isLoading ? null : _signInWithGoogle,
+                          onPressed: isLoading ? null : signInWithGoogle,
                           icon: Icon(Icons.g_mobiledata, size: 24),
                           label: Text('Sign in with Google'),
                           style: OutlinedButton.styleFrom(
@@ -247,7 +247,7 @@ class LoginPage extends StatelessWidget {
                           style: TextStyle(color: Colors.white70),
                         ),
                         TextButton(
-                          onPressed: _toggleMode,
+                          onPressed: toggleMode,
                           child: Text(
                             authState.isLogin ? 'Sign Up' : 'Sign In',
                             style: TextStyle(

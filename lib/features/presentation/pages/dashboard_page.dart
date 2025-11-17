@@ -57,7 +57,7 @@ class _DashboardPageState extends State<DashboardPage> {
               }
 
               if (state is DashboardLoading) {
-                return _buildSkeletonLoading(); // ✅ عرض شكل التحميل
+                return _buildSkeletonLoading();
               }
 
               return _buildSkeletonLoading();

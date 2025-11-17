@@ -11,6 +11,7 @@ import 'package:flutterweather/features/presentation/pages/weather_page.dart';
 import 'package:flutterweather/features/presentation/pages/notifypage.dart';
 import 'package:flutterweather/features/presentation/pages/pagetwo.dart';
 import 'package:flutterweather/features/presentation/pages/animated.dart';
+import 'package:flutterweather/features/presentation/pages/deeplink_test_page.dart';
 
 
 class AppRouter {
@@ -75,6 +76,11 @@ class AppRouter {
           name: 'login',
           builder: (context, state) => const LoginPage(),
         ),
+        //  GoRoute(
+        //   path: '/',
+        //   name: 'splash',
+        //   builder: (context, state) => const SplashAnimated(),
+        // ),
         GoRoute(
           path: '/dashboard',
           name: 'dashboard',
@@ -99,6 +105,11 @@ class AppRouter {
         GoRoute(
           path: '/pagetwo',
           redirect: (context, state) => '/another',
+        ),
+        GoRoute(
+          path: '/deeplink-test',
+          name: 'deeplink-test',
+          builder: (context, state) => const DeepLinkTestPage(),
         ),
       ],
     );

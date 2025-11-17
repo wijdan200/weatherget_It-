@@ -24,13 +24,13 @@ class Astronomy {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['moon_illumination'] = this.moonIllumination;
-    data['moon_phase'] = this.moonPhase;
-    data['moonrise'] = this.moonrise;
-    data['moonset'] = this.moonset;
-    data['sunrise'] = this.sunrise;
-    data['sunset'] = this.sunset;
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['moon_illumination'] = moonIllumination;
+    data['moon_phase'] = moonPhase;
+    data['moonrise'] = moonrise;
+    data['moonset'] = moonset;
+    data['sunrise'] = sunrise;
+    data['sunset'] = sunset;
     return data;
   }
 }

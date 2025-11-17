@@ -4,8 +4,10 @@ import 'package:flutterweather/features/domain/entities/weather.dart';
 
 class WeatherModel extends Weather {
  List<Astronomy>? astronomy;
+  @override
   String? avgtempC;
   String? avgtempF;
+  @override
   String? date;
   List<Hourly>? hourly;
   String? maxtempC;
@@ -34,7 +36,7 @@ class WeatherModel extends Weather {
     if (json['astronomy'] != null) {
       astronomy = <Astronomy>[];
       json['astronomy'].forEach((v) {
-        astronomy!.add(new Astronomy.fromJson(v));
+        astronomy!.add(Astronomy.fromJson(v));
       });
     }
     avgtempC = json['avgtempC'];
@@ -43,7 +45,7 @@ class WeatherModel extends Weather {
     if (json['hourly'] != null) {
       hourly = <Hourly>[];
       json['hourly'].forEach((v) {
-        hourly!.add(new Hourly.fromJson(v));
+        hourly!.add(Hourly.fromJson(v));
       });
     }
     maxtempC = json['maxtempC'];
@@ -56,23 +58,23 @@ class WeatherModel extends Weather {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.astronomy != null) {
-      data['astronomy'] = this.astronomy!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (astronomy != null) {
+      data['astronomy'] = astronomy!.map((v) => v.toJson()).toList();
     }
-    data['avgtempC'] = this.avgtempC;
-    data['avgtempF'] = this.avgtempF;
-    data['date'] = this.date;
-    if (this.hourly != null) {
-      data['hourly'] = this.hourly!.map((v) => v.toJson()).toList();
+    data['avgtempC'] = avgtempC;
+    data['avgtempF'] = avgtempF;
+    data['date'] = date;
+    if (hourly != null) {
+      data['hourly'] = hourly!.map((v) => v.toJson()).toList();
     }
-    data['maxtempC'] = this.maxtempC;
-    data['maxtempF'] = this.maxtempF;
-    data['mintempC'] = this.mintempC;
-    data['mintempF'] = this.mintempF;
-    data['sunHour'] = this.sunHour;
-    data['totalSnow_cm'] = this.totalSnowCm;
-    data['uvIndex'] = this.uvIndex;
+    data['maxtempC'] = maxtempC;
+    data['maxtempF'] = maxtempF;
+    data['mintempC'] = mintempC;
+    data['mintempF'] = mintempF;
+    data['sunHour'] = sunHour;
+    data['totalSnow_cm'] = totalSnowCm;
+    data['uvIndex'] = uvIndex;
     return data;
   }
 }

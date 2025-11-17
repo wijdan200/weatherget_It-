@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:app_links/app_links.dart';
 import 'package:flutterweather/firebase_options.dart';
 import 'package:flutterweather/injectionDependancy.dart';
 import 'package:flutterweather/features/presentation/bloc/auth/auth_bloc.dart';
@@ -68,8 +70,116 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final _appLinks = AppLinks();
+  StreamSubscription<Uri>? _linkSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _initDeepLinks();
+  }
+
+  void _initDeepLinks() {
+    debugPrint('🔧 Initializing deep links...');
+    
+    // Handle initial link (when app is opened from a deep link)
+    _appLinks.getInitialLink().then((uri) {
+      if (uri != null) {
+        debugPrint('📱 Initial deep link received: $uri');
+        _handleDeepLink(uri);
+      } else {
+        debugPrint('ℹ️ No initial deep link');
+      }
+    }).catchError((error) {
+      debugPrint('❌ Error getting initial link: $error');
+    });
+
+    // Handle links when app is already running
+    _linkSubscription = _appLinks.uriLinkStream.listen(
+      (uri) {
+        debugPrint('📱 Stream deep link received: $uri');
+        _handleDeepLink(uri);
+      },
+      onError: (err) {
+        debugPrint('❌ Deep link stream error: $err');
+      },
+      cancelOnError: false,
+    );
+    
+    debugPrint('✅ Deep link listeners initialized');
+  }
+
+  void _handleDeepLink(Uri uri) {
+    debugPrint('🔗 Deep link received: $uri');
+    debugPrint('   Scheme: ${uri.scheme}');
+    debugPrint('   Host: ${uri.host}');
+    debugPrint('   Path: ${uri.path}');
+    debugPrint('   Query: ${uri.query}');
+    
+    // Wait for router to be initialized
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final router = AppRouter.router;
+      if (router == null) {
+        debugPrint('❌ Router is null, cannot navigate');
+        return;
+      }
+      
+      try {
+        // Extract path from deep link
+        // Example: WeatherApp://weather -> /weather
+        // Example: WeatherApp://open/weather -> /weather (host is "open", path is "/weather")
+        // Example: WeatherApp://dashboard -> /dashboard
+        // Example: WeatherApp:// -> /dashboard (default)
+        String path = uri.path;
+        String host = uri.host;
+        
+        // If host is "open" and path exists, use the path
+        // Otherwise, if host is not empty and path is empty, use host as path
+        if (host == 'open' && path.isNotEmpty) {
+          // WeatherApp://open/weather -> use path "/weather"
+          debugPrint('   Using path from host "open": $path');
+        } else if (host.isNotEmpty && path.isEmpty) {
+          // WeatherApp://weather -> use host "weather" as path
+          path = host;
+          debugPrint('   Using host as path: $path');
+        }
+        
+        // Normalize path
+        path = path.trim();
+        if (path.isEmpty || path == '/') {
+          path = '/dashboard'; // Default path
+          debugPrint('   Using default path: $path');
+        } else {
+          // Ensure path starts with /
+          if (!path.startsWith('/')) {
+            path = '/$path';
+          }
+        }
+        
+        debugPrint('✅ Navigating to deep link path: $path');
+        
+        // Navigate to the path
+        router.go(path);
+      } catch (e, stackTrace) {
+        debugPrint('❌ Error handling deep link: $e');
+        debugPrint('   Stack trace: $stackTrace');
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

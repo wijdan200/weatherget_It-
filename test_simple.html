@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Deep Link Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 10px 0;
+            background: #2196F3;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .button:hover {
+            background: #1976D2;
+        }
+        .info {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🌤️ Simple Deep Link Test</h1>
+    
+    <div class="info">
+        <strong>⚠️ Important:</strong><br>
+        1. Make sure your app is installed and opened at least once<br>
+        2. Click the buttons below (don't type in address bar)
+    </div>
+    
+    <h2>Test Links:</h2>
+    
+    <a href="intent://open/weather#Intent;scheme=WeatherApp;package=com.example.flutterweather;end" class="button">
+        🌤️ Open Weather Page
+    </a>
+    
+    <a href="intent://open/dashboard#Intent;scheme=WeatherApp;package=com.example.flutterweather;end" class="button">
+        📊 Open Dashboard
+    </a>
+    
+    <a href="intent://open/notify#Intent;scheme=WeatherApp;package=com.example.flutterweather;end" class="button">
+        🔔 Open Notify Page
+    </a>
+    
+    <a href="WeatherApp://open/weather" class="button" style="background: #4CAF50;">
+        🌤️ Weather (Direct Scheme)
+    </a>
+    
+    <a href="WeatherApp://weather" class="button" style="background: #4CAF50;">
+        🌤️ Weather (Simple)
+    </a>
+    
+    <div class="info">
+        <strong>💡 Tip:</strong> If nothing happens, go to:<br>
+        Settings → Apps → flutterweather → Open by default → Enable "Open supported links"
+    </div>
+    
+    <script>
+        // Log clicks
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                console.log('Clicked:', this.href);
+                alert('Opening: ' + this.href);
+            });
+        });
+    </script>
+</body>
+</html>
+

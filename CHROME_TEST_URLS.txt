@@ -1,0 +1,28 @@
+Copy and paste these URLs in Chrome address bar on your Android phone:
+
+=== INTENT URI FORMAT (Works Best) ===
+
+Weather Page:
+intent://open/weather#Intent;scheme=WeatherApp;package=com.example.flutterweather;end
+
+Dashboard:
+intent://open/dashboard#Intent;scheme=WeatherApp;package=com.example.flutterweather;end
+
+Notify Page:
+intent://open/notify#Intent;scheme=WeatherApp;package=com.example.flutterweather;end
+
+Another Page:
+intent://open/another#Intent;scheme=WeatherApp;package=com.example.flutterweather;end
+
+=== CUSTOM SCHEME FORMAT ===
+
+WeatherApp://open/weather
+WeatherApp://open/dashboard
+WeatherApp://open/notify
+WeatherApp://open/another
+
+=== DIRECT FORMAT ===
+
+WeatherApp://weather
+WeatherApp://dashboard
+

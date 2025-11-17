@@ -20,13 +20,13 @@ class NearestArea {
     if (json['areaName'] != null) {
       areaName = <AreaName>[];
       json['areaName'].forEach((v) {
-        areaName!.add(new AreaName.fromJson(v));
+        areaName!.add(AreaName.fromJson(v));
       });
     }
     if (json['country'] != null) {
       country = <Country>[];
       json['country'].forEach((v) {
-        country!.add(new Country.fromJson(v));
+        country!.add(Country.fromJson(v));
       });
     }
     latitude = json['latitude'];
@@ -35,33 +35,33 @@ class NearestArea {
     if (json['region'] != null) {
       region = <Region>[];
       json['region'].forEach((v) {
-        region!.add(new Region.fromJson(v));
+        region!.add(Region.fromJson(v));
       });
     }
     if (json['weatherUrl'] != null) {
       weatherUrl = <WeatherUrl>[];
       json['weatherUrl'].forEach((v) {
-        weatherUrl!.add(new WeatherUrl.fromJson(v));
+        weatherUrl!.add(WeatherUrl.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    if (this.areaName != null) {
-      data['areaName'] = this.areaName!.map((v) => v.toJson()).toList();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    if (areaName != null) {
+      data['areaName'] = areaName!.map((v) => v.toJson()).toList();
     }
-    if (this.country != null) {
-      data['country'] = this.country!.map((v) => v.toJson()).toList();
+    if (country != null) {
+      data['country'] = country!.map((v) => v.toJson()).toList();
     }
-    data['latitude'] = this.latitude;
-    data['longitude'] = this.longitude;
-    data['population'] = this.population;
-    if (this.region != null) {
-      data['region'] = this.region!.map((v) => v.toJson()).toList();
+    data['latitude'] = latitude;
+    data['longitude'] = longitude;
+    data['population'] = population;
+    if (region != null) {
+      data['region'] = region!.map((v) => v.toJson()).toList();
     }
-    if (this.weatherUrl != null) {
-      data['weatherUrl'] = this.weatherUrl!.map((v) => v.toJson()).toList();
+    if (weatherUrl != null) {
+      data['weatherUrl'] = weatherUrl!.map((v) => v.toJson()).toList();
     }
     return data;
   }

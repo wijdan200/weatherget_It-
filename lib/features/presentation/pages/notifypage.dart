@@ -8,12 +8,21 @@ class NotifyPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0), size: 28),
+          onPressed: () {
+            context.go('/weather');
+          },
+          tooltip: 'Back to weather',
+        ),
         title: const Text('Notification Page'),
       ),
+     
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+      
             const Text(
               'Welcome',
               style: TextStyle(
