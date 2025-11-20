@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:app_links/app_links.dart';
+import 'package:flutterweather/features/presentation/widget/Applife.dart';
 import 'package:flutterweather/firebase_options.dart';
 import 'package:flutterweather/injectionDependancy.dart';
 import 'package:flutterweather/features/presentation/bloc/auth/auth_bloc.dart';
@@ -14,7 +15,6 @@ import 'package:flutterweather/features/data/datasource/firebase_messaging_servi
 import 'package:flutterweather/router/app_router.dart';
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Skip on web - background messages not supported
   if (kIsWeb) {
     debugPrint("Background message handler not supported on web");
     return;
@@ -36,8 +36,8 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
       }
     }
   } catch (e, stackTrace) {
-    debugPrint("Error in background message handler: $e");
-    debugPrint("Stack trace: $stackTrace");
+    // debugPrint("Error in background message handler: $e");
+    // debugPrint("Stack trace: $stackTrace");
   }
 }
 
@@ -46,6 +46,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+    
   
   setup();
   try {
@@ -57,7 +58,6 @@ void main() async {
     if (!kIsWeb) {
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
       
-      // Initialize Firebase Messaging (without requesting permission - will be requested after login)
       final messagingService = getIt<FirebaseMessagingService>();
       await messagingService.initialize(requestPermissionOnInit: false);
       await initializeLocalNotifications(); 
@@ -84,47 +84,42 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    print("App started deep link");
+    
     _initDeepLinks();
   }
 
   void _initDeepLinks() {
-    debugPrint('🔧 Initializing deep links...');
-    
-    // Handle initial link (when app is opened from a deep link)
+    print("App started deep link init");
+
     _appLinks.getInitialLink().then((uri) {
       if (uri != null) {
+        debugPrint('deep link initial uri: $uri');
         debugPrint('📱 Initial deep link received: $uri');
         _handleDeepLink(uri);
       } else {
-        debugPrint('ℹ️ No initial deep link');
       }
     }).catchError((error) {
-      debugPrint('❌ Error getting initial link: $error');
     });
 
     // Handle links when app is already running
     _linkSubscription = _appLinks.uriLinkStream.listen(
       (uri) {
-        debugPrint('📱 Stream deep link received: $uri');
+                debugPrint('deep link listen: $uri');
+
         _handleDeepLink(uri);
       },
       onError: (err) {
-        debugPrint('❌ Deep link stream error: $err');
+        
       },
       cancelOnError: false,
     );
     
-    debugPrint('✅ Deep link listeners initialized');
   }
 
   void _handleDeepLink(Uri uri) {
-    debugPrint('🔗 Deep link received: $uri');
-    debugPrint('   Scheme: ${uri.scheme}');
-    debugPrint('   Host: ${uri.host}');
-    debugPrint('   Path: ${uri.path}');
-    debugPrint('   Query: ${uri.query}');
-    
-    // Wait for router to be initialized
+          debugPrint('deep link handel');
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final router = AppRouter.router;
       if (router == null) {
@@ -164,13 +159,11 @@ class _MyAppState extends State<MyApp> {
           }
         }
         
-        debugPrint('✅ Navigating to deep link path: $path');
         
         // Navigate to the path
         router.go(path);
       } catch (e, stackTrace) {
-        debugPrint('❌ Error handling deep link: $e');
-        debugPrint('   Stack trace: $stackTrace');
+    
       }
     });
   }
@@ -183,6 +176,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+   
+
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -197,7 +192,13 @@ class _MyAppState extends State<MyApp> {
       ],
       child: Builder(
         builder: (context) {
-          return MaterialApp.router(
+          return AppLifecycleObserver(
+            // child: WillPopScope(
+            //   onWillPop: () async {
+            //     debugPrint("The user close the app using Back button");
+            //     return true;
+            //   },
+           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
             title: 'Weather App',
             theme: ThemeData(
@@ -205,9 +206,12 @@ class _MyAppState extends State<MyApp> {
               useMaterial3: true,
             ),
             routerConfig: AppRouter.createRouter(context),
-          );
+          ),
+        //  ), for WillPopScope .. 
+         );
         },
       ),
-    );
+   
+  );
   }
 }

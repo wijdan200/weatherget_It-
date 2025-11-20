@@ -32,6 +32,14 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
         _isLoading = false;
       }
     });
+
+    on<AppPausedEvent>((event, emit) {
+      debugPrint('📱 DashboardBloc: Application paused');
+    });
+
+    on<AppResumedEvent>((event, emit) {
+      debugPrint('📱 DashboardBloc: Application resumed');
+    });
   }
 }
 

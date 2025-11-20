@@ -67,7 +67,7 @@ class AppRouter {
           builder: (context, state) => const Notfound(),
         ),
         GoRoute(
-          path: '/',
+          path: '/splash',
           name: 'splash',
           builder: (context, state) => const SplashAnimated(),
         ),

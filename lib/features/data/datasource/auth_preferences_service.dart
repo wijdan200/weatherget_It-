@@ -8,6 +8,7 @@ class AuthPreferencesService {
   static const String _keyUserPhotoUrl = 'user_photo_url';
   static const String _keyAuthProvider = 'auth_provider';
   static const String _keyLastLoginTime = 'last_login_time';
+static const String _keyIsRunning = 'is_running';
 
   Future<SharedPreferences> get _prefs => SharedPreferences.getInstance();
 
@@ -46,7 +47,14 @@ class AuthPreferencesService {
     final prefs = await _prefs;
     return prefs.getBool(_keyIsLoggedIn) ?? false;
   }
-
+Future<void> setAppRunning(bool running) async {
+  final prefs = await _prefs;
+  await prefs.setBool(_keyIsRunning, running);
+}
+Future<bool> isAppRunning() async {
+  final prefs = await _prefs;
+  return prefs.getBool(_keyIsRunning) ?? false;
+}
   // Get user ID
   Future<String?> getUserId() async {
     final prefs = await _prefs;
@@ -87,6 +95,7 @@ class AuthPreferencesService {
     return null;
   }
 
+
   // Get all auth data
   Future<Map<String, dynamic>> getAuthData() async {
     final prefs = await _prefs;
@@ -98,6 +107,9 @@ class AuthPreferencesService {
       'photoUrl': prefs.getString(_keyUserPhotoUrl),
       'authProvider': prefs.getString(_keyAuthProvider),
       'lastLoginTime': prefs.getString(_keyLastLoginTime),
+      
+      
+
     };
   }
 }

@@ -11,3 +11,7 @@ class SearchQueryChangedEvent extends WeatherEvent {
   final String query;
   SearchQueryChangedEvent(this.query);
 }
+
+class AppPausedEvent extends WeatherEvent {}
+
+class AppResumedEvent extends WeatherEvent {}

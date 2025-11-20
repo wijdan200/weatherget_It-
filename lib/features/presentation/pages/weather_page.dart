@@ -12,7 +12,7 @@ import 'package:flutterweather/injectionDependancy.dart';
 import 'package:flutterweather/features/data/datasource/firebase_messaging_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-
+import 'dart:io';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
@@ -27,7 +27,9 @@ class _WeatherPageState extends State<WeatherPage> {
   bool _hasRequestedPermission = false;
 
   @override
-  void initState() {
+  void initState() {    context.read<WeatherBloc>().add(
+      FetchWeatherEvent(),
+    );
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _requestNotificationPermission();
@@ -116,6 +118,7 @@ class _WeatherPageState extends State<WeatherPage> {
 
   void _addCity(String cityName) {
     if (cityName.trim().isEmpty) return;
+    print("fetch city: $cityName");
     context.read<WeatherBloc>().add(
       FetchWeatherEvent(location: cityName.trim()),
     );
@@ -275,6 +278,8 @@ class _WeatherPageState extends State<WeatherPage> {
 
   @override
   Widget build(BuildContext context) {
+   
+  
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -285,8 +290,10 @@ class _WeatherPageState extends State<WeatherPage> {
           ),
         ),
         child: SafeArea(
+          
           child: BlocBuilder<WeatherBloc, WeatherState>(
             builder: (context, state) {
+               
               final citiesList = _getCitiesFromState(state);
 
               // Show skeleton loading when loading or when initial state with no cities
@@ -596,8 +603,8 @@ class _WeatherPageState extends State<WeatherPage> {
                   const Text(
                     'Weather',
                     style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                        fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
@@ -607,7 +614,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 
                 children: [
                   IconButton(
-                    icon: Icon(Icons.refresh, color: Colors.white),
+                    icon: Icon(Icons.refresh, color: Colors.white,size:24),
                     onPressed: () {
                       final cityName = citiesList.isNotEmpty
                           ? _getCityName(citiesList.first)
@@ -620,21 +627,32 @@ class _WeatherPageState extends State<WeatherPage> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete_outline, color: Colors.white),
+                    icon: Icon(Icons.delete_outline, color: Colors.white,size:24),
                     onPressed: () =>
                         context.read<WeatherBloc>().add(ClearCitiesEvent()),
                     tooltip: 'Clear all cities',
                   ),
                   IconButton(
-                    icon: Icon(Icons.logout, color: Colors.white),
+                    icon: Icon(Icons.logout, color: Colors.white,size:24),
                     onPressed: () {
                       context.read<AuthBloc>().add(SignOutRequested());
                     },
                     tooltip: 'Sign Out',
                   ),
+
+
+                  IconButton(
+                    icon: Icon(Icons.close, color: Colors.white,size:20 ),
+                    onPressed: () {
+                      exit(0);
+                    },
+                    tooltip: 'Exit App',
+                    constraints: BoxConstraints(),
+                    padding: EdgeInsets.all(0),
+                  ),
                 ],
              
-),
+               ),
             ],
           ),
           SizedBox(height: 15),
@@ -695,6 +713,7 @@ class _WeatherPageState extends State<WeatherPage> {
         ),
       ],
     );
+    
   }
 
   // UI Widget: Search field
@@ -749,6 +768,7 @@ class _WeatherPageState extends State<WeatherPage> {
   ) {
     if (filteredList.isEmpty) {
       return Expanded(
+        
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
