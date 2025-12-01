@@ -22,7 +22,7 @@ class _SplashAnimatedState extends State<SplashAnimated>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 300),
     );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -42,7 +42,7 @@ class _SplashAnimatedState extends State<SplashAnimated>
     _controller.forward();
 
     // Navigate after splash duration using GoRouter
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 1), () {
       if (mounted) {
         final authBloc = context.read<AuthBloc>();
         final authState = authBloc.state;

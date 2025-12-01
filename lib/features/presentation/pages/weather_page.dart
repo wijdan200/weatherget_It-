@@ -27,9 +27,8 @@ class _WeatherPageState extends State<WeatherPage> {
   bool _hasRequestedPermission = false;
 
   @override
-  void initState() {    context.read<WeatherBloc>().add(
-      FetchWeatherEvent(),
-    );
+  void initState() {
+    context.read<WeatherBloc>().add(FetchWeatherEvent());
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _requestNotificationPermission();
@@ -41,20 +40,19 @@ class _WeatherPageState extends State<WeatherPage> {
       debugPrint("Notification permissions not available on web");
       return;
     }
-    
+
     if (_hasRequestedPermission) return;
     _hasRequestedPermission = true;
 
     try {
       final messagingService = getIt<FirebaseMessagingService>();
-      
+
       // Check current permission status
       final currentStatus = await messagingService.getPermissionStatus();
-      
+
       // Only request if permission is not determined or denied
-      if (currentStatus == AuthorizationStatus.notDetermined || 
+      if (currentStatus == AuthorizationStatus.notDetermined ||
           currentStatus == AuthorizationStatus.denied) {
-        
         // Show a dialog explaining why we need permission
         final shouldRequest = await showDialog<bool>(
           context: context,
@@ -79,7 +77,7 @@ class _WeatherPageState extends State<WeatherPage> {
         if (shouldRequest == true && mounted) {
           // Request permission (shows system dialog)
           final result = await messagingService.requestPermission();
-          
+
           if (mounted) {
             if (result.isGranted) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -93,7 +91,9 @@ class _WeatherPageState extends State<WeatherPage> {
             } else if (result.isDenied) {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(
-                  content: Text('Notification permission denied. You can enable it later in settings.'),
+                  content: Text(
+                    'Notification permission denied. You can enable it later in settings.',
+                  ),
                   backgroundColor: Colors.orange,
                 ),
               );
@@ -118,7 +118,8 @@ class _WeatherPageState extends State<WeatherPage> {
 
   void _addCity(String cityName) {
     if (cityName.trim().isEmpty) return;
-    print("fetch city: $cityName");
+    debugPrint("fetch city: $cityName");
+
     context.read<WeatherBloc>().add(
       FetchWeatherEvent(location: cityName.trim()),
     );
@@ -278,8 +279,6 @@ class _WeatherPageState extends State<WeatherPage> {
 
   @override
   Widget build(BuildContext context) {
-   
-  
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -290,10 +289,8 @@ class _WeatherPageState extends State<WeatherPage> {
           ),
         ),
         child: SafeArea(
-          
           child: BlocBuilder<WeatherBloc, WeatherState>(
             builder: (context, state) {
-               
               final citiesList = _getCitiesFromState(state);
 
               // Show skeleton loading when loading or when initial state with no cities
@@ -345,7 +342,6 @@ class _WeatherPageState extends State<WeatherPage> {
       ),
     );
   }
-
 
   // Loading state with Skeletonizer
   Widget _buildSkeletonLoadingState() {
@@ -495,7 +491,6 @@ class _WeatherPageState extends State<WeatherPage> {
     );
   }
 
-
   Widget _buildErrorState(BuildContext context, String message) {
     return Center(
       child: Container(
@@ -593,7 +588,11 @@ class _WeatherPageState extends State<WeatherPage> {
               Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Colors.white,
+                      size: 28,
+                    ),
                     onPressed: () {
                       context.go('/dashboard');
                     },
@@ -604,17 +603,16 @@ class _WeatherPageState extends State<WeatherPage> {
                     'Weather',
                     style: TextStyle(
                       fontSize: 15,
-                        fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                       color: Colors.white,
                     ),
                   ),
                 ],
               ),
               Row(
-                
                 children: [
                   IconButton(
-                    icon: Icon(Icons.refresh, color: Colors.white,size:24),
+                    icon: Icon(Icons.refresh, color: Colors.white, size: 24),
                     onPressed: () {
                       final cityName = citiesList.isNotEmpty
                           ? _getCityName(citiesList.first)
@@ -627,22 +625,25 @@ class _WeatherPageState extends State<WeatherPage> {
                     },
                   ),
                   IconButton(
-                    icon: Icon(Icons.delete_outline, color: Colors.white,size:24),
+                    icon: Icon(
+                      Icons.delete_outline,
+                      color: Colors.white,
+                      size: 24,
+                    ),
                     onPressed: () =>
                         context.read<WeatherBloc>().add(ClearCitiesEvent()),
                     tooltip: 'Clear all cities',
                   ),
                   IconButton(
-                    icon: Icon(Icons.logout, color: Colors.white,size:24),
+                    icon: Icon(Icons.logout, color: Colors.white, size: 24),
                     onPressed: () {
                       context.read<AuthBloc>().add(SignOutRequested());
                     },
                     tooltip: 'Sign Out',
                   ),
 
-
                   IconButton(
-                    icon: Icon(Icons.close, color: Colors.white,size:20 ),
+                    icon: Icon(Icons.close, color: Colors.white, size: 20),
                     onPressed: () {
                       exit(0);
                     },
@@ -651,8 +652,7 @@ class _WeatherPageState extends State<WeatherPage> {
                     padding: EdgeInsets.all(0),
                   ),
                 ],
-             
-               ),
+              ),
             ],
           ),
           SizedBox(height: 15),
@@ -713,7 +713,6 @@ class _WeatherPageState extends State<WeatherPage> {
         ),
       ],
     );
-    
   }
 
   // UI Widget: Search field
@@ -768,7 +767,6 @@ class _WeatherPageState extends State<WeatherPage> {
   ) {
     if (filteredList.isEmpty) {
       return Expanded(
-        
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

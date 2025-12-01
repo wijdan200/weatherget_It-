@@ -199,6 +199,7 @@ class LoginPage extends StatelessWidget {
                                 )
                               : Text(
                                   authState.isLogin ? 'Sign In' : 'Sign Up',
+                                  
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,

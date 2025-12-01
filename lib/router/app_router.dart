@@ -34,7 +34,7 @@ class AppRouter {
         final authBloc = context.read<AuthBloc>();
         final authState = authBloc.state;
         final isGoingToLogin = state.matchedLocation == '/login';
-        final isGoingToSplash = state.matchedLocation == '/';
+        final isGoingToSplash = state.matchedLocation == '/splash';
 
         // If authenticated and trying to go to login, redirect to dashboard
         if (authState is AuthAuthenticated && isGoingToLogin) {
@@ -85,7 +85,9 @@ class AppRouter {
           path: '/dashboard',
           name: 'dashboard',
           builder: (context, state) => const DashboardPage(),
+
         ),
+  
         GoRoute(
           path: '/weather',
           name: 'weather',

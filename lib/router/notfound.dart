@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class Notfound extends StatefulWidget {
   const Notfound({super.key});
@@ -24,11 +25,17 @@ class _NotfoundState extends State<Notfound>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
+  Widget build(BuildContext context) =>
+     Scaffold(
       body: Center(
-        child: Text("Page Not Found "))
-     
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Lottie.asset('android/assets/Loading animation.json'),
+          
+          ],
+        ),
+      ),
     );
   }
-}
+
