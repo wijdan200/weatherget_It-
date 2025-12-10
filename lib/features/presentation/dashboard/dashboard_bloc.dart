@@ -16,7 +16,7 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
 
       _isLoading = true;
       emit(DashboardLoading());
-      
+
       try {
         final data = await repository.fetchDashboardData();
         if (data.isEmpty) {
@@ -40,6 +40,31 @@ class DashboardBloc extends Bloc<DashboardEvent, DashboardState> {
     on<AppResumedEvent>((event, emit) {
       debugPrint('📱 DashboardBloc: Application resumed');
     });
+
+    on<DashboardItemHoverEvent>((event, emit) {
+      final newHoverStates = Map<int, bool>.from(state.hoverStates);
+      newHoverStates[event.index] = event.isHovering;
+
+      if (state is DashboardLoaded) {
+        emit(
+          DashboardLoaded(
+            (state as DashboardLoaded).data,
+            hoverStates: newHoverStates,
+          ),
+        );
+      } else if (state is DashboardLoading) {
+        emit(DashboardLoading(hoverStates: newHoverStates));
+      } else if (state is DashboardError) {
+        emit(
+          DashboardError(
+            (state as DashboardError).message,
+            hoverStates: newHoverStates,
+          ),
+        );
+      } else {
+        // For initial state or others
+        emit(DashboardInitial(hoverStates: newHoverStates));
+      }
+    });
   }
 }
-

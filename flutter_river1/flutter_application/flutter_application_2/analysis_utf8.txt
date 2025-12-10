@@ -1,0 +1,78 @@
+﻿Analyzing flutter_application_2...                              
+
+   info - Unnecessary constructor invocation - lib\getx\Data\Model\mealto.dart:16:39 - prefer_collection_literals
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:17:9 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:18:23 - unnecessary_this
+   info - Unnecessary 'new' keyword - lib\getx\Data\Model\mealto.dart:192:39 - unnecessary_new
+   info - Unnecessary constructor invocation - lib\getx\Data\Model\mealto.dart:192:39 - prefer_collection_literals
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:193:22 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:194:23 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:195:32 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:196:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:197:23 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:198:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:199:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:200:23 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:201:26 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:202:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:203:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:204:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:205:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:206:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:207:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:208:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:209:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:210:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:211:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:212:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:213:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:214:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:215:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:216:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:217:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:218:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:219:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:220:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:221:31 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:222:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:223:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:224:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:225:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:226:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:227:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:228:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:229:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:230:27 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:231:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:232:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:233:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:234:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:235:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:236:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:237:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:238:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:239:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:240:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:241:28 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:242:25 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:243:30 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:244:43 - unnecessary_this
+   info - Unnecessary 'this.' qualifier - lib\getx\Data\Model\mealto.dart:245:28 - unnecessary_this
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:4:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:26:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:27:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:28:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:29:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:30:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:46:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:47:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:48:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:49:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:50:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:51:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:52:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:53:7 - unnecessary_question_mark
+warning - The '?' is unnecessary because 'Null' is nullable without it - lib\getx\Domain\entities\vars.dart:54:7 - unnecessary_question_mark
+   info - Constructors for public widgets should have a named 'key' parameter - lib\getx\Presentation\pages\meal_page.dart:5:7 - use_key_in_widget_constructors
+   info - Constructors for public widgets should have a named 'key' parameter - lib\getx\main.dart:9:7 - use_key_in_widget_constructors
+

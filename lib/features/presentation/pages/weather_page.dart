@@ -8,11 +8,14 @@ import 'package:flutterweather/features/presentation/bloc/weatherevent.dart';
 import 'package:flutterweather/features/presentation/bloc/weatherstate.dart';
 import 'package:flutterweather/features/presentation/bloc/auth/auth_bloc.dart';
 import 'package:flutterweather/features/presentation/bloc/auth/auth_event.dart';
+import 'package:flutterweather/features/presentation/bloc/language/language_cubit.dart';
 import 'package:flutterweather/injectionDependancy.dart';
 import 'package:flutterweather/features/data/datasource/firebase_messaging_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:flutterweather/l10n/app_localizations.dart';
 import 'dart:io';
+import 'package:google_fonts/google_fonts.dart';
 
 class WeatherPage extends StatefulWidget {
   const WeatherPage({super.key});
@@ -348,12 +351,32 @@ class _WeatherPageState extends State<WeatherPage> {
     return Expanded(
       child: Skeletonizer(
         enabled: true,
-        child: ListView.builder(
-          itemCount: 3,
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          physics: BouncingScrollPhysics(),
-          itemBuilder: (context, index) {
-            return _buildSkeletonWeatherCard();
+        ignorePointers: false,
+        child: BlocBuilder<WeatherBloc, WeatherState>(
+          builder: (context, state) {
+            return ListView.builder(
+              itemCount: 3,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              physics: BouncingScrollPhysics(),
+              itemBuilder: (context, index) {
+                final isHovered = state.hoverStates[index] ?? false;
+                return MouseRegion(
+                  onEnter: (_) => context.read<WeatherBloc>().add(
+                    SkeletonHoverEvent(index, true),
+                  ),
+                  onExit: (_) => context.read<WeatherBloc>().add(
+                    SkeletonHoverEvent(index, false),
+                  ),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    transform: isHovered
+                        ? (Matrix4.identity()..scale(1.02))
+                        : Matrix4.identity(),
+                    child: _buildSkeletonWeatherCard(),
+                  ),
+                );
+              },
+            );
           },
         ),
       ),
@@ -413,8 +436,9 @@ class _WeatherPageState extends State<WeatherPage> {
                       SizedBox(width: 5),
                       Expanded(
                         child: Text(
-                          'Loading Location Name...',
-                          style: TextStyle(
+                          AppLocalizations.of(context)!.loading_location,
+                          style: GoogleFonts.getFont(
+                            'Lato',
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: Color(0xFF1E3C72),
@@ -427,8 +451,12 @@ class _WeatherPageState extends State<WeatherPage> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    'Loading Date...',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    AppLocalizations.of(context)!.loading_date,
+                    style: GoogleFonts.getFont(
+                      'Lato',
+                      fontSize: 14,
+                      color: Colors.grey[600],
+                    ),
                   ),
                   SizedBox(height: 8),
                   Container(
@@ -438,8 +466,9 @@ class _WeatherPageState extends State<WeatherPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      'Loading Weather Description...',
-                      style: TextStyle(
+                      AppLocalizations.of(context)!.loading_desc,
+                      style: GoogleFonts.getFont(
+                        'Lato',
                         fontSize: 12,
                         color: Color(0xFF667EEA),
                         fontWeight: FontWeight.w500,
@@ -455,7 +484,8 @@ class _WeatherPageState extends State<WeatherPage> {
               children: [
                 Text(
                   '00°C',
-                  style: TextStyle(
+                  style: GoogleFonts.getFont(
+                    'Lato',
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFFFF6B6B),
@@ -468,7 +498,11 @@ class _WeatherPageState extends State<WeatherPage> {
                     SizedBox(width: 4),
                     Text(
                       '00%',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      style: GoogleFonts.getFont(
+                        'Lato',
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
@@ -479,7 +513,11 @@ class _WeatherPageState extends State<WeatherPage> {
                     SizedBox(width: 4),
                     Text(
                       '00 km/h',
-                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      style: GoogleFonts.getFont(
+                        'Lato',
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                      ),
                     ),
                   ],
                 ),
@@ -509,17 +547,23 @@ class _WeatherPageState extends State<WeatherPage> {
             Icon(Icons.error_outline, size: 80, color: Colors.red),
             SizedBox(height: 20),
             Text(
-              'Oops!',
+              AppLocalizations.of(context)!.oops,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF1E3C72),
+                fontStyle: FontStyle.italic,
               ),
             ),
             SizedBox(height: 10),
             Text(
               message,
-              style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+              style: GoogleFonts.getFont(
+                'Lato',
+                fontSize: 16,
+                color: Colors.grey[700],
+                fontStyle: FontStyle.italic,
+              ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 30),
@@ -527,7 +571,7 @@ class _WeatherPageState extends State<WeatherPage> {
               onPressed: () =>
                   context.read<WeatherBloc>().add(FetchWeatherEvent()),
               icon: Icon(Icons.refresh),
-              label: Text('Retry'),
+              label: Text(AppLocalizations.of(context)!.retry),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                 backgroundColor: Color(0xFF1E3C72),
@@ -552,19 +596,47 @@ class _WeatherPageState extends State<WeatherPage> {
           Icon(Icons.wb_sunny, size: 100, color: Colors.white),
           SizedBox(height: 30),
           Text(
-            'Weather App',
-            style: TextStyle(
+            AppLocalizations.of(context)!.weather_app,
+            style: GoogleFonts.getFont(
+              'Lato',
               fontSize: 32,
               fontWeight: FontWeight.bold,
               color: Colors.white,
+              fontStyle: FontStyle.italic,
             ),
           ),
           SizedBox(height: 10),
           Text(
-            'Add cities to see weather information',
-            style: TextStyle(fontSize: 16, color: Colors.white70),
+            AppLocalizations.of(context)!.add_cities_message,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.white70,
+              fontStyle: FontStyle.italic,
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildCompactIconButton({
+    required BuildContext context,
+    required IconData icon,
+    required VoidCallback onPressed,
+    required String tooltip,
+  }) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: onPressed,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Icon(icon, color: Colors.white, size: 24),
+          ),
+        ),
       ),
     );
   }
@@ -587,21 +659,19 @@ class _WeatherPageState extends State<WeatherPage> {
             children: [
               Row(
                 children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.arrow_back,
-                      color: Colors.white,
-                      size: 28,
-                    ),
+                  _buildCompactIconButton(
+                    context: context,
+                    icon: Icons.arrow_back,
                     onPressed: () {
                       context.go('/dashboard');
                     },
-                    tooltip: 'Back to Dashboard',
+                    tooltip: AppLocalizations.of(context)!.back_to_dashboard,
                   ),
-                  const SizedBox(width: 10),
-                  const Text(
-                    'Weather',
-                    style: TextStyle(
+                  const SizedBox(width: 4),
+                  Text(
+                    AppLocalizations.of(context)!.weather,
+                    style: GoogleFonts.getFont(
+                      'Lato',
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
                       color: Colors.white,
@@ -609,49 +679,58 @@ class _WeatherPageState extends State<WeatherPage> {
                   ),
                 ],
               ),
-              Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.refresh, color: Colors.white, size: 24),
-                    onPressed: () {
-                      final cityName = citiesList.isNotEmpty
-                          ? _getCityName(citiesList.first)
-                          : null;
-                      if (cityName != null) {
-                        context.read<WeatherBloc>().add(
-                          FetchWeatherEvent(location: cityName),
-                        );
-                      }
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.delete_outline,
-                      color: Colors.white,
-                      size: 24,
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    _buildCompactIconButton(
+                      context: context,
+                      icon: Icons.language,
+                      onPressed: () {
+                        context.read<LanguageCubit>().toggleLanguage();
+                      },
+                      tooltip: AppLocalizations.of(context)!.toggle_language,
                     ),
-                    onPressed: () =>
-                        context.read<WeatherBloc>().add(ClearCitiesEvent()),
-                    tooltip: 'Clear all cities',
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.logout, color: Colors.white, size: 24),
-                    onPressed: () {
-                      context.read<AuthBloc>().add(SignOutRequested());
-                    },
-                    tooltip: 'Sign Out',
-                  ),
-
-                  IconButton(
-                    icon: Icon(Icons.close, color: Colors.white, size: 20),
-                    onPressed: () {
-                      exit(0);
-                    },
-                    tooltip: 'Exit App',
-                    constraints: BoxConstraints(),
-                    padding: EdgeInsets.all(0),
-                  ),
-                ],
+                    _buildCompactIconButton(
+                      context: context,
+                      icon: Icons.refresh,
+                      onPressed: () {
+                        final cityName = citiesList.isNotEmpty
+                            ? _getCityName(citiesList.first)
+                            : null;
+                        if (cityName != null) {
+                          context.read<WeatherBloc>().add(
+                            FetchWeatherEvent(location: cityName),
+                          );
+                        }
+                      },
+                      tooltip: AppLocalizations.of(context)!.refresh,
+                    ),
+                    _buildCompactIconButton(
+                      context: context,
+                      icon: Icons.delete_outline,
+                      onPressed: () =>
+                          context.read<WeatherBloc>().add(ClearCitiesEvent()),
+                      tooltip: AppLocalizations.of(context)!.clear_all_cities,
+                    ),
+                    _buildCompactIconButton(
+                      context: context,
+                      icon: Icons.logout,
+                      onPressed: () {
+                        context.read<AuthBloc>().add(SignOutRequested());
+                      },
+                      tooltip: AppLocalizations.of(context)!.sign_out,
+                    ),
+                    _buildCompactIconButton(
+                      context: context,
+                      icon: Icons.close,
+                      onPressed: () {
+                        exit(0);
+                      },
+                      tooltip: AppLocalizations.of(context)!.exit_app,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -661,8 +740,15 @@ class _WeatherPageState extends State<WeatherPage> {
           // _buildSearchField(context, searchQuery),
           SizedBox(height: 10),
           Text(
-            '${citiesList.length} city${citiesList.length != 1 ? 'ies' : ''} • ${filteredList.length} location${filteredList.length != 1 ? 's' : ''} found',
-            style: TextStyle(color: Colors.white70, fontSize: 14),
+            AppLocalizations.of(context)!.cities_found(
+              citiesList.length.toString(),
+              filteredList.length.toString(),
+            ),
+            style: GoogleFonts.getFont(
+              'Lato',
+              color: Colors.white70,
+              fontSize: 14,
+            ),
           ),
         ],
       ),
@@ -685,10 +771,14 @@ class _WeatherPageState extends State<WeatherPage> {
             ),
             child: TextField(
               controller: _cityController,
-              style: TextStyle(color: Colors.white),
+              style: GoogleFonts.getFont('Lato', color: Colors.white),
               decoration: InputDecoration(
-                hintText: 'Enter city name (e.g., Amman, London, Paris)...',
-                hintStyle: TextStyle(color: Colors.white70, fontSize: 13),
+                hintText: AppLocalizations.of(context)!.enter_city_name,
+                hintStyle: GoogleFonts.getFont(
+                  'Lato',
+                  color: Colors.white70,
+                  fontSize: 13,
+                ),
                 prefixIcon: Icon(Icons.add_location, color: Colors.white),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(
@@ -715,51 +805,6 @@ class _WeatherPageState extends State<WeatherPage> {
     );
   }
 
-  // UI Widget: Search field
-  // Widget _buildSearchField(BuildContext context, String searchQuery) {
-  //   // Sync controller with BLoC state (without triggering onChanged)
-  //   if (_searchController.text != searchQuery) {
-  //     _searchController.value = TextEditingValue(
-  //       text: searchQuery,
-  //       selection: TextSelection.collapsed(offset: searchQuery.length),
-  //     );
-  //   }
-
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       color: Colors.white.withOpacity(0.2),
-  //       borderRadius: BorderRadius.circular(25),
-  //       border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
-  //     ),
-  //     child: TextField(
-  //       controller: _searchController,
-  //       style: TextStyle(color: Colors.white),
-  //       decoration: InputDecoration(
-  //         hintText: 'Search by location or date...',
-  //         hintStyle: TextStyle(color: Colors.white70),
-  //         prefixIcon: Icon(Icons.search, color: Colors.white),
-  //         suffixIcon: searchQuery.isNotEmpty
-  //             ? IconButton(
-  //                 icon: Icon(Icons.clear, color: Colors.white),
-  //                 onPressed: () {
-  //                   _searchController.clear();
-  //                   context.read<WeatherBloc>().add(SearchQueryChangedEvent(''));
-  //                 },
-  //               )
-  //             : null,
-  //         border: InputBorder.none,
-  //         contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-  //       ),
-  //       onChanged: (value) {
-  //         // Only dispatch event on user input, not on programmatic changes
-  //         if (value != searchQuery) {
-  //           context.read<WeatherBloc>().add(SearchQueryChangedEvent(value));
-  //         }
-  //       },
-  //     ),
-  //   );
-  // }
-
   // UI Widget: Weather list
   Widget _buildWeatherListWidget(
     List<Map<String, dynamic>> filteredList,
@@ -777,7 +822,11 @@ class _WeatherPageState extends State<WeatherPage> {
                 weatherList.isEmpty
                     ? 'No weather data available'
                     : 'No results found',
-                style: TextStyle(fontSize: 18, color: Colors.white70),
+                style: GoogleFonts.getFont(
+                  'Lato',
+                  fontSize: 18,
+                  color: Colors.white70,
+                ),
               ),
             ],
           ),
@@ -796,17 +845,42 @@ class _WeatherPageState extends State<WeatherPage> {
 
           return TweenAnimationBuilder<double>(
             tween: Tween(begin: 0.0, end: 1.0),
-            duration: Duration(milliseconds: 300 + (index * 100)),
+            duration: Duration(milliseconds: 800 + (index * 800)),
             builder: (context, value, child) {
               return Opacity(
                 opacity: value,
                 child: Transform.translate(
-                  offset: Offset(0, 20 * (1 - value)),
+                  offset: Offset(-50 * (1 - value), 0),
                   child: child,
                 ),
               );
             },
-            child: _buildWeatherCard(item, isCurrent),
+            child: BlocBuilder<WeatherBloc, WeatherState>(
+              builder: (context, state) {
+                // Determine if this specific item is hovered based on its index
+                // Note: We use a different range of indices or just reuse the same map key mechanism.
+                // Since skeleton list and main list aren't shown together, reusing index is fine.
+                // However, index 0 in skeleton means different UI than index 0 in main list.
+                // But conceptually 'index 0 is hovered' is valid for the visible list.
+                final isHovered = state.hoverStates[index] ?? false;
+
+                return MouseRegion(
+                  onEnter: (_) => context.read<WeatherBloc>().add(
+                    SkeletonHoverEvent(index, true),
+                  ),
+                  onExit: (_) => context.read<WeatherBloc>().add(
+                    SkeletonHoverEvent(index, false),
+                  ),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 800),
+                    transform: isHovered
+                        ? (Matrix4.identity()..scale(1.02))
+                        : Matrix4.identity(),
+                    child: _buildWeatherCard(item, isCurrent),
+                  ),
+                );
+              },
+            ),
           );
         },
       ),
@@ -822,7 +896,7 @@ class _WeatherPageState extends State<WeatherPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: isCurrent
-              ? [Colors.white, Colors.blue.shade50]
+              ? [const Color.fromARGB(255, 225, 129, 129), Colors.blue.shade50]
               : [
                   Colors.white.withOpacity(0.95),
                   Colors.white.withOpacity(0.85),
@@ -889,7 +963,8 @@ class _WeatherPageState extends State<WeatherPage> {
             Expanded(
               child: Text(
                 item['address'] ?? 'Unknown',
-                style: TextStyle(
+                style: GoogleFonts.getFont(
+                  'Lato',
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF1E3C72),
@@ -904,7 +979,11 @@ class _WeatherPageState extends State<WeatherPage> {
           SizedBox(height: 5),
           Text(
             item['date'] ?? '',
-            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+            style: GoogleFonts.getFont(
+              'Lato',
+              fontSize: 14,
+              color: Colors.grey[600],
+            ),
           ),
         ],
         if (isCurrent && item['weatherDesc'] != null) ...[
@@ -917,7 +996,8 @@ class _WeatherPageState extends State<WeatherPage> {
             ),
             child: Text(
               item['weatherDesc'] ?? '',
-              style: TextStyle(
+              style: GoogleFonts.getFont(
+                'Lato',
                 fontSize: 12,
                 color: Color(0xFF667EEA),
                 fontWeight: FontWeight.w500,
@@ -936,7 +1016,8 @@ class _WeatherPageState extends State<WeatherPage> {
       children: [
         Text(
           item['temperature'] ?? 'N/A',
-          style: TextStyle(
+          style: GoogleFonts.getFont(
+            'Lato',
             fontSize: 28,
             fontWeight: FontWeight.bold,
             color: Color(0xFFFF6B6B),
@@ -963,7 +1044,8 @@ class _WeatherPageState extends State<WeatherPage> {
           SizedBox(height: 5),
           Text(
             'Max: ${item['maxTemp']}°C',
-            style: TextStyle(
+            style: GoogleFonts.getFont(
+              'Lato',
               fontSize: 12,
               color: Colors.orange,
               fontWeight: FontWeight.w600,
@@ -971,7 +1053,8 @@ class _WeatherPageState extends State<WeatherPage> {
           ),
           Text(
             'Min: ${item['minTemp']}°C',
-            style: TextStyle(
+            style: GoogleFonts.getFont(
+              'Lato',
               fontSize: 12,
               color: Colors.blue,
               fontWeight: FontWeight.w600,
@@ -982,7 +1065,8 @@ class _WeatherPageState extends State<WeatherPage> {
               padding: EdgeInsets.only(top: 3),
               child: Text(
                 'UV: ${item['uvIndex']}',
-                style: TextStyle(
+                style: GoogleFonts.getFont(
+                  'Lato',
                   fontSize: 11,
                   color: Colors.purple,
                   fontWeight: FontWeight.w500,
@@ -1000,7 +1084,14 @@ class _WeatherPageState extends State<WeatherPage> {
       children: [
         Icon(icon, size: 14, color: color),
         SizedBox(width: 4),
-        Text(text, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+        Text(
+          text,
+          style: GoogleFonts.getFont(
+            'Lato',
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
       ],
     );
   }

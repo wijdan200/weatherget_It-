@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,12 +10,9 @@ class DeepLinkTestPage extends StatelessWidget {
     try {
       final Uri uri = Uri.parse(uriString);
       debugPrint('🧪 Testing deep link: $uriString');
-      
+
       if (await canLaunchUrl(uri)) {
-        await launchUrl(
-          uri,
-          mode: LaunchMode.externalApplication,
-        );
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
         debugPrint('✅ Launched: $uriString');
       } else {
         debugPrint('❌ Cannot launch: $uriString');
@@ -94,10 +92,7 @@ class DeepLinkTestPage extends StatelessWidget {
           const SizedBox(height: 20),
           const Text(
             'Direct Navigation (For Testing)',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           ElevatedButton.icon(
@@ -149,7 +144,13 @@ class DeepLinkTestPage extends StatelessWidget {
         title: Text(label),
         subtitle: Text(
           uri,
-          style: const TextStyle(fontSize: 12, fontFamily: 'monospace'),
+          style: const TextStyle(
+            fontSize: 12,
+            fontFamily: 'lato',
+            fontStyle: FontStyle.italic,
+            fontWeight: FontWeight.bold,
+            color: Colors.blue,
+          ),
         ),
         trailing: const Icon(Icons.arrow_forward),
         onTap: () => _testDeepLink(uri),
@@ -157,10 +158,3 @@ class DeepLinkTestPage extends StatelessWidget {
     );
   }
 }
-
-
-
-
-
-
-

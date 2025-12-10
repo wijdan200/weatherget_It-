@@ -15,3 +15,9 @@ class SearchQueryChangedEvent extends WeatherEvent {
 class AppPausedEvent extends WeatherEvent {}
 
 class AppResumedEvent extends WeatherEvent {}
+
+class SkeletonHoverEvent extends WeatherEvent {
+  final int index;
+  final bool isHovered;
+  SkeletonHoverEvent(this.index, this.isHovered);
+}

@@ -1,0 +1,7 @@
+﻿Analyzing flutter_application_2...                              
+
+  error - The class 'GoogleSignIn' doesn't have an unnamed constructor - lib\getx\Presentation\controllers\auth_controller.dart:9:29 - new_with_undefined_constructor_default
+  error - The method 'signIn' isn't defined for the type 'GoogleSignIn' - lib\getx\Presentation\controllers\auth_controller.dart:29:64 - undefined_method
+   info - Uses 'await' on an instance of 'GoogleSignInAuthentication', which is not a subtype of 'Future' - lib\getx\Presentation\controllers\auth_controller.dart:33:11 - await_only_futures
+  error - The getter 'accessToken' isn't defined for the type 'GoogleSignInAuthentication' - lib\getx\Presentation\controllers\auth_controller.dart:36:33 - undefined_getter
+

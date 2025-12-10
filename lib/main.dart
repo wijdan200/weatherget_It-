@@ -5,14 +5,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:app_links/app_links.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutterweather/features/presentation/widget/Applife.dart';
 import 'package:flutterweather/firebase_options.dart';
 import 'package:flutterweather/injectionDependancy.dart';
 import 'package:flutterweather/features/presentation/bloc/auth/auth_bloc.dart';
+import 'package:flutterweather/features/presentation/bloc/auth/auth_state.dart';
 import 'package:flutterweather/features/presentation/bloc/weatherbloc.dart';
 import 'package:flutterweather/features/presentation/dashboard/dashboard_bloc.dart';
+import 'package:flutterweather/features/presentation/bloc/language/language_cubit.dart';
 import 'package:flutterweather/features/data/datasource/firebase_messaging_service.dart';
 import 'package:flutterweather/router/app_router.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutterweather/l10n/app_localizations.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart' as intl;
 
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -48,7 +55,9 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   setup();
   try {
@@ -144,18 +153,18 @@ class _MyAppState extends State<MyApp> {
         // Otherwise, if host is not empty and path is empty, use host as path
         if (host == 'open' && path.isNotEmpty) {
           // WeatherApp://open/weather -> use path "/weather"
-          debugPrint('   Using path from host "open": $path');
+          debugPrint('Using path from host "open": $path');
         } else if (host.isNotEmpty && path.isEmpty) {
           // WeatherApp://weather -> use host "weather" as path
           path = host;
-          debugPrint('   Using host as path: $path');
+          debugPrint('Using host as path: $path');
         }
 
         // Normalize path
         path = path.trim();
         if (path.isEmpty || path == '/') {
           path = '/dashboard'; // Default path
-          debugPrint('   Using default path: $path');
+          debugPrint('Using default path: $path');
         } else {
           // Ensure path starts with /
           if (!path.startsWith('/')) {
@@ -165,6 +174,7 @@ class _MyAppState extends State<MyApp> {
 
         // Navigate to the path
         router.go(path);
+        print("mutasim,");
       } catch (e, stackTrace) {
         debugPrint('Error handling deep link: $e');
         debugPrint('Stack trace: $stackTrace');
@@ -185,25 +195,45 @@ class _MyAppState extends State<MyApp> {
         BlocProvider(create: (_) => getIt<AuthBloc>()),
         BlocProvider(create: (_) => getIt<WeatherBloc>()),
         BlocProvider(create: (_) => getIt<DashboardBloc>()),
+        BlocProvider(create: (_) => LanguageCubit()),
       ],
       child: Builder(
         builder: (context) {
           return AppLifecycleObserver(
-            // child: WillPopScope(
-            //   onWillPop: () async {
-            //     debugPrint("The user close the app using Back button");
-            //     return true;
-            //   },
-            child: MaterialApp.router(
-              debugShowCheckedModeBanner: false,
-              title: 'Weather App',
-              theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
-              routerConfig: AppRouter.createRouter(context),
+            child: BlocBuilder<LanguageCubit, Locale>(
+              builder: (context, locale) {
+                //should add this for responsive as a new package screenutil
+                // ScreenUtilInit(
+                //   designSize: const Size(360, 690),
+                //   builder: (context, child) {
+                return MaterialApp.router(
+                  locale: locale,
+                  supportedLocales: AppLocalizations.supportedLocales,
+                  localizationsDelegates: const [
+                    AppLocalizations.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  debugShowCheckedModeBanner: false,
+                  title: 'Weather App',
+                  theme: ThemeData(
+                    //to set the default font lato
+                    textTheme: TextTheme(bodyMedium: GoogleFonts.lato()),
+                    primarySwatch: Colors.blue,
+                    useMaterial3: true,
+                  ),
+                  routerConfig: AppRouter.createRouter(context),
+                );
+              },
             ),
-            //  ), for WillPopScope ..
           );
         },
       ),
     );
   }
+}
+
+bool isArabic() {
+  return intl.Intl.getCurrentLocale() == 'ar';
 }

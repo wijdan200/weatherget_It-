@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "643400216720",
+    "project_id": "meal-50068",
+    "storage_bucket": "meal-50068.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:643400216720:android:ea8e52389cd14594e26815",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "643400216720-t0bf1jvm7sio89220drfhv868ba63fdb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDrcyWYhU4JNwW7PuIczWXumj8LZWXRcno"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "643400216720-t0bf1jvm7sio89220drfhv868ba63fdb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
